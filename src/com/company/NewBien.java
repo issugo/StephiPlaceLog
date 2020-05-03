@@ -3,6 +3,7 @@ package com.company;
 import java.awt.*;
 import java.io.File;
 import javax.swing.*;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 public class NewBien extends JPanel {
 
@@ -17,7 +18,10 @@ public class NewBien extends JPanel {
 
     String[] myTypeTab = {"maison", "appartement"};
 
-    public NewBien() {
+    public NewBien() throws Exception {
+        //set css default
+        UIManager.setLookAndFeel(new NimbusLookAndFeel());
+
         // setup layout
         setLayout(new GridLayout(14, 2));
 
@@ -114,7 +118,7 @@ public class NewBien extends JPanel {
         JFileChooser choix = new JFileChooser();
         choix.setMultiSelectionEnabled(true);
         MyFilter mf = new MyFilter(new String[] {"gif", "jpeg", "tif", "jpg", "png"}, "fichiers images");
-        choix.addChoosableFileFilter(mf);
+        choix.setFileFilter(mf);
         int retour = choix.showOpenDialog(choix);
         if (retour == JFileChooser.APPROVE_OPTION) {
             //fichiers choisis donc sortie = OK

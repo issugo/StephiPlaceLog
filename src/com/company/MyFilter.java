@@ -13,7 +13,7 @@ public class MyFilter extends FileFilter {
         this.laDescription = laDescription;
     }
 
-    boolean appartient( String suffixe ){
+    boolean appartient(String suffixe){
         for (String lesSuffix : lesSuffixes)
             if (suffixe.equals(lesSuffix))
                 return true;

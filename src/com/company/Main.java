@@ -3,6 +3,10 @@ package com.company;
 public class Main {
 
     public static void main(String[] args) {
-        new Application();
+        try {
+            new Application();
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
