@@ -1,7 +1,8 @@
 package com.company;
 
+import com.backend.Images;
+
 import java.awt.*;
-import java.io.File;
 import javax.swing.*;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
@@ -10,7 +11,7 @@ public class NewBien extends JPanel {
     JLabel superficie, nbPieces, type, description, jardin, cave, ceillier, loggia, terrasse, garage, verranda, prixMin, prixVente, images;
     JTextField descriptionField;
     JCheckBox jardinField, caveField, ceillierField, loggiaField, terrasseField, garageField, verrandaField;
-    JComboBox typeField;
+    JComboBox<String> typeField;
     JSpinner nbPiecesField, prixMinField, prixVenteField;
     SpinnerModel pieceModel, prixModel;
     JTextField superficieField;
@@ -40,7 +41,7 @@ public class NewBien extends JPanel {
 
         // add type
         this.type = new JLabel("type : ");
-        this.typeField = new JComboBox(this.myTypeTab);
+        this.typeField = new JComboBox<>(this.myTypeTab);
         add(this.type);
         add(this.typeField);
 
@@ -115,24 +116,6 @@ public class NewBien extends JPanel {
     }
 
     public static void getImages() {
-        JFileChooser choix = new JFileChooser();
-        choix.setMultiSelectionEnabled(true);
-        MyFilter mf = new MyFilter(new String[] {"gif", "jpeg", "tif", "jpg", "png"}, "fichiers images");
-        choix.setFileFilter(mf);
-        int retour = choix.showOpenDialog(choix);
-        if (retour == JFileChooser.APPROVE_OPTION) {
-            //fichiers choisis donc sortie = OK
-            File[] fs = choix.getSelectedFiles();
-            for (File f : fs) {
-                //nom du fichier
-                String name = f.getName();
-                System.out.println(name);
-                //chemin du fichier
-                String path = f.getAbsolutePath();
-                System.out.println(path);
-            }
-        } else {
-            System.out.println("aucun fichier choisi");
-        }
+        Images.getImage();
     }
 }

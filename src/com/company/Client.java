@@ -3,9 +3,9 @@ package com.company;
 import javax.swing.*;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
-import java.io.File;
 
 import com.backend.ClientBack;
+import com.backend.Images;
 
 public class Client extends JPanel {
 
@@ -93,28 +93,15 @@ public class Client extends JPanel {
         this.CINField.addActionListener(e -> getCartesIdentites());
         this.add(this.CINField);
 
+        this.revalidate();
+        this.repaint();
+
     }
 
     public static void getCartesIdentites() {
-        JFileChooser choix = new JFileChooser();
-        choix.setMultiSelectionEnabled(true);
-        MyFilter mf = new MyFilter(new String[] {"gif", "jpeg", "tif", "jpg", "png"}, "fichiers images");
-        choix.setFileFilter(mf);
-        int retour = choix.showOpenDialog(choix);
-        if (retour == JFileChooser.APPROVE_OPTION) {
-            //fichiers choisis donc sortie = OK
-            File[] fs = choix.getSelectedFiles();
-            for (File f : fs) {
-                //nom du fichier
-                String name = f.getName();
-                System.out.println(name);
-                //chemin du fichier
-                String path = f.getAbsolutePath();
-                System.out.println(path);
-            }
-        } else {
-            System.out.println("aucun fichier choisi");
-        }
+        Images.getImage();
     }
+
+
 
 }
