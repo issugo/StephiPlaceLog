@@ -1,12 +1,12 @@
 package com.company;
 
-import com.backend.AnnoncesBack;
+import com.backend.Annonce;
 import com.backend.Images;
 
 import java.awt.*;
 import javax.swing.*;
 
-public class Annonces extends JPanel {
+public class AnnoncePanel extends JPanel {
 
     JButton choix1, choix2;
 
@@ -21,7 +21,7 @@ public class Annonces extends JPanel {
 
     String[] myTypeTab = {"maison", "appartement"};
 
-    public Annonces() {
+    public AnnoncePanel() {
 
         this.choix1 = new JButton("voir les annonces");
         this.choix1.addActionListener(e -> showAllAnnonces());
@@ -46,7 +46,7 @@ public class Annonces extends JPanel {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setSize(500, 500);
         this.setPreferredSize(new Dimension(500, 500));
-        for (String annonce: AnnoncesBack.getAllAnnonces()) {
+        for (String annonce: Annonce.getAllAnnonces()) {
             this.add(new JLabel(annonce));
         }
         this.revalidate();
@@ -144,7 +144,7 @@ public class Annonces extends JPanel {
         // add images
         this.images = new JLabel("image(s) : ");
         this.imagesField = new JButton("image(s)");
-        this.imagesField.addActionListener(e -> Annonces.getImages());
+        this.imagesField.addActionListener(e -> AnnoncePanel.getImages());
         this.add(this.images);
         this.add(this.imagesField);
 

@@ -4,10 +4,10 @@ import javax.swing.*;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
 
-import com.backend.ClientBack;
+import com.backend.Client;
 import com.backend.Images;
 
-public class Client extends JPanel {
+public class ClientPanel extends JPanel {
 
     JButton choix1, choix2;
 
@@ -16,7 +16,7 @@ public class Client extends JPanel {
     JButton CINField, submit;
     JFormattedTextField telField;
 
-    public Client() {
+    public ClientPanel() {
         this.choix1 = new JButton("voir les clients");
         this.choix1.addActionListener(e -> showAllClients());
         this.choix2 = new JButton("créer client");
@@ -36,7 +36,7 @@ public class Client extends JPanel {
     public void showAllClients() {
         this.removeAll();
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        for (String client: ClientBack.getAllClient()) {
+        for (String client: Client.getAllClient()) {
             this.add(new JLabel(client));
         }
         this.revalidate();

@@ -18,15 +18,15 @@ public class Application extends JFrame{
 
     //panel que l'on affiche
     JPanel mainPanel;
-    Annonces annoncePanel;
-    Client clientsPanel;
+    AnnoncePanel annoncePanel;
+    ClientPanel clientsPanel;
 
     public Application() throws Exception {
         //preparation des components
         this.save = this;
         this.mainPanel = new JPanel();
-        this.annoncePanel = new Annonces();
-        this.clientsPanel = new Client();
+        this.annoncePanel = new AnnoncePanel();
+        this.clientsPanel = new ClientPanel();
 
         //set css default
         UIManager.setLookAndFeel(new NimbusLookAndFeel());
@@ -72,8 +72,8 @@ public class Application extends JFrame{
 
     public void afficherClientPanel() {
         try {
-            this.annoncePanel = new Annonces();
-            this.clientsPanel = new Client();
+            this.annoncePanel = new AnnoncePanel();
+            this.clientsPanel = new ClientPanel();
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }
@@ -89,8 +89,8 @@ public class Application extends JFrame{
         this.mainPanel.revalidate();
         this.mainPanel.repaint();
         try {
-            this.annoncePanel = new Annonces();
-            this.clientsPanel = new Client();
+            this.annoncePanel = new AnnoncePanel();
+            this.clientsPanel = new ClientPanel();
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }
