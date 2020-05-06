@@ -1,12 +1,14 @@
 package com.company;
 
+import com.backend.AnnoncesBack;
 import com.backend.Images;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
-public class NewBien extends JPanel {
+public class Annonces extends JPanel {
+
+    JButton choix1, choix2;
 
     JLabel superficie, nbPieces, type, description, jardin, cave, ceillier, loggia, terrasse, garage, verranda, prixMin, prixVente, images;
     JTextField descriptionField;
@@ -15,104 +17,144 @@ public class NewBien extends JPanel {
     JSpinner nbPiecesField, prixMinField, prixVenteField;
     SpinnerModel pieceModel, prixModel;
     JTextField superficieField;
-    JButton imagesField;
+    JButton imagesField, submit;
 
     String[] myTypeTab = {"maison", "appartement"};
 
-    public NewBien() throws Exception {
-        //set css default
-        UIManager.setLookAndFeel(new NimbusLookAndFeel());
+    public Annonces() {
 
+        this.choix1 = new JButton("voir les annonces");
+        this.choix1.addActionListener(e -> showAllAnnonces());
+        this.choix2 = new JButton("créer annonce");
+        this.choix2.addActionListener(e -> {
+            try {
+                showCreateAnnonceForm();
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        });
+
+        this.setLayout(new GridLayout(1, 2));
+        this.add(this.choix1);
+        this.add(this.choix2);
+
+
+    }
+
+    public void showAllAnnonces() {
+        this.removeAll();
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.setSize(500, 500);
+        this.setPreferredSize(new Dimension(500, 500));
+        for (String annonce: AnnoncesBack.getAllAnnonces()) {
+            this.add(new JLabel(annonce));
+        }
+        this.revalidate();
+        this.repaint();
+    }
+
+    public void showCreateAnnonceForm() {
+        this.removeAll();
         // setup layout
-        setLayout(new GridLayout(14, 2));
+        this.setLayout(new GridLayout(15, 2));
+        this.setSize(500, 500);
+        this.setPreferredSize(new Dimension(500, 500));
 
         // add superficie
         this.superficie = new JLabel("superficie :");
         this.superficieField = new JTextField();
-        add(this.superficie);
-        add(this.superficieField);
+        this.add(this.superficie);
+        this.add(this.superficieField);
 
         // add nb_pieces
         this.nbPieces = new JLabel("nombre de pieces :");
         this.pieceModel = new SpinnerNumberModel(0, 0, 20, 1);
         this.nbPiecesField = new JSpinner(this.pieceModel);
-        add(this.nbPieces);
-        add(this.nbPiecesField);
+        this.add(this.nbPieces);
+        this.add(this.nbPiecesField);
 
         // add type
         this.type = new JLabel("type : ");
         this.typeField = new JComboBox<>(this.myTypeTab);
-        add(this.type);
-        add(this.typeField);
+        this.add(this.type);
+        this.add(this.typeField);
 
         // add description
         this.description = new JLabel("description : ");
         this.descriptionField = new JTextField();
-        add(this.description);
-        add(this.descriptionField);
+        this.add(this.description);
+        this.add(this.descriptionField);
 
         // add jardin
         this.jardin = new JLabel("jardin : ");
         this.jardinField = new JCheckBox();
-        add(this.jardin);
-        add(this.jardinField);
+        this.add(this.jardin);
+        this.add(this.jardinField);
 
         // add cave
         this.cave = new JLabel("cave : ");
         this.caveField = new JCheckBox();
-        add(this.cave);
-        add(this.caveField);
+        this.add(this.cave);
+        this.add(this.caveField);
 
         // add ceillier
         this.ceillier = new JLabel("ceillier : ");
         this.ceillierField = new JCheckBox();
-        add(this.ceillier);
-        add(this.ceillierField);
+        this.add(this.ceillier);
+        this.add(this.ceillierField);
 
         // add loggia
         this.loggia = new JLabel("loggia : ");
         this.loggiaField = new JCheckBox();
-        add(this.loggia);
-        add(this.loggiaField);
+        this.add(this.loggia);
+        this.add(this.loggiaField);
 
         // add terrasse
         this.terrasse = new JLabel("terrasse : ");
         this.terrasseField = new JCheckBox();
-        add(this.terrasse);
-        add(this.terrasseField);
+        this.add(this.terrasse);
+        this.add(this.terrasseField);
 
         // add garage
         this.garage = new JLabel("garage : ");
         this.garageField = new JCheckBox();
-        add(this.garage);
-        add(this.garageField);
+        this.add(this.garage);
+        this.add(this.garageField);
 
         // add verranda
         this.verranda = new JLabel("verranda : ");
         this.verrandaField = new JCheckBox();
-        add(this.verranda);
-        add(this.verrandaField);
+        this.add(this.verranda);
+        this.add(this.verrandaField);
 
         // add prixMin
         this.prixMin = new JLabel("prix minimum : ");
         this.prixModel = new SpinnerNumberModel(0, 0, 999999999, 0.01);
         this.prixMinField = new JSpinner(prixModel);
-        add(this.prixMin);
-        add(this.prixMinField);
+        this.add(this.prixMin);
+        this.add(this.prixMinField);
 
         // add prixVente
         this.prixVente = new JLabel("prix de vente : ");
         this.prixModel = new SpinnerNumberModel(0, 0, 999999999, 0.01);
         this.prixVenteField = new JSpinner(prixModel);
-        add(this.prixVente);
-        add(this.prixVenteField);
+        this.add(this.prixVente);
+        this.add(this.prixVenteField);
 
         // add images
         this.images = new JLabel("image(s) : ");
         this.imagesField = new JButton("image(s)");
-        this.imagesField.addActionListener(e -> NewBien.getImages());
-        add(this.images);
-        add(this.imagesField);
+        this.imagesField.addActionListener(e -> Annonces.getImages());
+        this.add(this.images);
+        this.add(this.imagesField);
+
+        //boutton submit
+        this.add(new JPanel());
+        this.submit = new JButton("submit");
+        this.add(this.submit);
+
+        this.revalidate();
+        this.repaint();
     }
 
     public static void getImages() {

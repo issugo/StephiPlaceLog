@@ -18,14 +18,14 @@ public class Application extends JFrame{
 
     //panel que l'on affiche
     JPanel mainPanel;
-    NewBien newBien;
+    Annonces annoncePanel;
     Client clientsPanel;
 
     public Application() throws Exception {
         //preparation des components
         this.save = this;
         this.mainPanel = new JPanel();
-        this.newBien = new NewBien();
+        this.annoncePanel = new Annonces();
         this.clientsPanel = new Client();
 
         //set css default
@@ -72,7 +72,7 @@ public class Application extends JFrame{
 
     public void afficherClientPanel() {
         try {
-            this.newBien = new NewBien();
+            this.annoncePanel = new Annonces();
             this.clientsPanel = new Client();
         } catch(Exception e) {
             System.out.println(e.getMessage());
@@ -85,11 +85,11 @@ public class Application extends JFrame{
 
     public void afficherBienPanel() {
         this.mainPanel.removeAll();
-        this.mainPanel.add(newBien, BorderLayout.CENTER);
+        this.mainPanel.add(annoncePanel, BorderLayout.CENTER);
         this.mainPanel.revalidate();
         this.mainPanel.repaint();
         try {
-            this.newBien = new NewBien();
+            this.annoncePanel = new Annonces();
             this.clientsPanel = new Client();
         } catch(Exception e) {
             System.out.println(e.getMessage());

@@ -9,17 +9,14 @@ import com.backend.Images;
 
 public class Client extends JPanel {
 
-    JLabel debug;
     JButton choix1, choix2;
 
     JLabel nom, prenom, email, addresse, tel, password, CIN;
     JTextField nomField, prenomField, emailField, addresseField, passwordField;
-    JButton CINField;
+    JButton CINField, submit;
     JFormattedTextField telField;
 
     public Client() {
-        //debugging
-        this.debug = new JLabel("debug");
         this.choix1 = new JButton("voir les clients");
         this.choix1.addActionListener(e -> showAllClients());
         this.choix2 = new JButton("créer client");
@@ -48,7 +45,7 @@ public class Client extends JPanel {
 
     public void showCreateVendeurForm() throws Exception {
         this.removeAll();
-        this.setLayout(new GridLayout(8,2));
+        this.setLayout(new GridLayout(9,2));
 
         //ajout pour le nom
         this.nom = new JLabel("nom :");
@@ -92,6 +89,11 @@ public class Client extends JPanel {
         this.CINField = new JButton("images");
         this.CINField.addActionListener(e -> getCartesIdentites());
         this.add(this.CINField);
+
+        //boutton de submit
+        this.submit = new JButton("submit");
+        this.add(new JPanel());
+        this.add(this.submit);
 
         this.revalidate();
         this.repaint();
