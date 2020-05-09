@@ -4,6 +4,7 @@ import com.backend.Annonce;
 import com.backend.Images;
 
 import java.awt.*;
+import java.sql.SQLException;
 import javax.swing.*;
 
 public class AnnoncePanel extends JPanel {
@@ -24,7 +25,7 @@ public class AnnoncePanel extends JPanel {
     public AnnoncePanel() {
 
         this.choix1 = new JButton("voir les annonces");
-        this.choix1.addActionListener(e -> showAllAnnonces());
+        //this.choix1.addActionListener(e -> showAllAnnonces());
         this.choix2 = new JButton("créer annonce");
         this.choix2.addActionListener(e -> {
             try {
@@ -41,14 +42,14 @@ public class AnnoncePanel extends JPanel {
 
     }
 
-    public void showAllAnnonces() {
+    public void showAllAnnonces() throws SQLException, ClassNotFoundException {
         this.removeAll();
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setSize(500, 500);
         this.setPreferredSize(new Dimension(500, 500));
-        for (String annonce: Annonce.getAllAnnonces()) {
-            this.add(new JLabel(annonce));
-        }
+        /*
+         * voila quoi, faut afficher les annonces
+         */
         this.revalidate();
         this.repaint();
     }

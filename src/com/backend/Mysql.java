@@ -46,7 +46,7 @@ public class Mysql {
         return resultat;
     }
 
-    public int insertOrUpdate(String requete) throws SQLException {
+    public Integer insertOrUpdate(String requete) throws SQLException {
         this.st = this.cn.createStatement();
         return this.st.executeUpdate(requete);
     }
