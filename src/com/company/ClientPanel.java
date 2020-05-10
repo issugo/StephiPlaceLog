@@ -3,6 +3,7 @@ package com.company;
 import javax.swing.*;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
+import java.sql.SQLException;
 
 import com.backend.Client;
 import com.backend.Images;
@@ -36,9 +37,9 @@ public class ClientPanel extends JPanel {
     public void showAllClients() {
         this.removeAll();
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        for (String client: Client.getAllClient()) {
-            this.add(new JLabel(client));
-        }
+        //for (String client: Client.findAll().toString()) {
+        //    this.add(new JLabel(client));
+        //}
         this.revalidate();
         this.repaint();
     }

@@ -58,15 +58,6 @@ public class Client {
         return this.email;
     }
 
-    public String setAddresse(String addresse) {
-        this.addresse = addresse;
-        return addresse;
-    }
-
-    public String getAddresse() {
-        return this.addresse;
-    }
-
     public String setTelephone(String telephone) {
         this.telephone = telephone;
         return telephone;
@@ -86,42 +77,70 @@ public class Client {
     }
 
     public String toString() {
-        return "id : " + this.getId() + "; nom : " + this.getNom() + "; prenom : " + this.getPrenom() + "; email :" + this.getEmail() + "; telephone :" + this.getTelephone() + "; addresse : " + this.getAddresse() + ";";
+        return "id : " + this.getId() + "; nom : " + this.getNom() + "; prenom : " + this.getPrenom() + "; email :" + this.getEmail() + "; telephone :" + this.getTelephone() + ";";
     }
 
-    public Boolean save() throws SQLException, ClassNotFoundException {
-        Boolean retour = false;
-        Mysql db = new Mysql("localhost", "3306", "testufjava", "root", "");
+    public boolean save() throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
-        String query = "INSERT INTO clients(nom, prenom, email, addresse, telephone, password) VALUES (" + this.getNom() + "," + this.getPrenom() + "," + this.getEmail() + "," + this.getAddresse() + "," + this.getTelephone() + "," + this.getPassword() + ")";
+        String query = "INSERT INTO client(nom, prenom, email, telephone, password) VALUES (" + this.getNom() + "," + this.getPrenom() + "," + this.getEmail() + "," + this.getTelephone() + "," + this.getPassword() + ")";
         Integer test = db.insertOrUpdate(query);
         if (test > 1) {
             retour = true;
         }
+        db.close();
+        return retour;
+    }
+
+    public boolean update(String champ, String newValue) throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "UPDATE client SET " + champ + " = " + newValue + " WHERE id = " + this.getId() + ";";
+        Integer test = db.insertOrUpdate(query);
+        if (test > 1) {
+            retour = true;
+        }
+        db.close();
+        return retour;
+    }
+
+    public boolean delete() throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "DELETE FROM client WHERE id = " + this.getId() + ";";
+        Integer test = db.insertOrUpdate(query);
+        if (test > 1) {
+            retour = true;
+        }
+        db.close();
         return retour;
     }
 
     public static @NotNull Client find(Integer id) throws SQLException, ClassNotFoundException {
-        Mysql db = new Mysql("localhost", "3306", "testufjava", "root", "");
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
-        String query = "SELECT * FROM clients WHERE id = ";
+        String query = "SELECT * FROM client WHERE id = ";
         query += id;
         ResultSet result = db.select(query);
+        result.next();
         Client instance = new Client();
         instance.setId(result.getInt("id"));
         instance.setNom(result.getString("nom"));
         instance.setPrenom(result.getString("prenom"));
         instance.setEmail(result.getString("email"));
-        instance.setPassword(result.getString("addresse"));
+        instance.setPassword(result.getString("password"));
         instance.setTelephone(result.getString("telephone"));
         return instance;
     }
 
     public static @NotNull List findAll() throws SQLException, ClassNotFoundException {
         List<Client> retour = new ArrayList<>();
-        Mysql db = new Mysql("localhost", "3306", "testufjava", "root", "");
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
-        String query = "SELECT * FROM clients";
+        String query = "SELECT * FROM client";
         ResultSet result = db.select(query);
         while (result.next()) {
             Client instance = new Client();
@@ -129,7 +148,7 @@ public class Client {
             instance.setNom(result.getString("nom"));
             instance.setPrenom(result.getString("prenom"));
             instance.setEmail(result.getString("email"));
-            instance.setPassword(result.getString("addresse"));
+            instance.setPassword(result.getString("password"));
             instance.setTelephone(result.getString("telephone"));
             retour.add(instance);
         }
@@ -137,14 +156,14 @@ public class Client {
     }
 
     public boolean isVendeur() throws SQLException, ClassNotFoundException {
-        Boolean retour = false;
-        Mysql db = new Mysql("localhost", "3306", "testufjava", "root", "");
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
-        String query = "SELECT * FROM vendeur WHERE id = ";
+        String query = "SELECT * FROM vendeur WHERE id_client = ";
         query += this.getId();
         ResultSet result = db.select(query);
         ResultSetMetaData meta = result.getMetaData();
-        if(meta.getColumnCount() != 0) {
+        while (result.next()) {
             retour = true;
         }
         return retour;

@@ -1,6 +1,7 @@
 package com.company;
 
 import com.backend.Annonce;
+import com.backend.Client;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,8 +17,9 @@ public class Main {
             System.out.println(e.getMessage());
         }*/
 
-        Annonce voila = new Annonce();
-        voila.getAllAnnonces();
+        //DEBUG
+        System.out.println(Client.find(1).isVendeur());
+        //FIN DEBUG
     }
 
 
