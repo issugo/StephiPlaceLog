@@ -1,9 +1,10 @@
 package com.company;
 
 import com.backend.Annonce;
-import com.backend.Images;
+import com.backend.Image;
 
 import java.awt.*;
+import java.io.IOException;
 import java.sql.SQLException;
 import javax.swing.*;
 
@@ -38,7 +39,6 @@ public class AnnoncePanel extends JPanel {
         this.setLayout(new GridLayout(1, 2));
         this.add(this.choix1);
         this.add(this.choix2);
-
 
     }
 
@@ -145,7 +145,15 @@ public class AnnoncePanel extends JPanel {
         // add images
         this.images = new JLabel("image(s) : ");
         this.imagesField = new JButton("image(s)");
-        this.imagesField.addActionListener(e -> AnnoncePanel.getImages());
+        this.imagesField.addActionListener(e -> {
+            try {
+                AnnoncePanel.getImages();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        });
         this.add(this.images);
         this.add(this.imagesField);
 
@@ -158,7 +166,7 @@ public class AnnoncePanel extends JPanel {
         this.repaint();
     }
 
-    public static void getImages() {
-        Images.getImage();
+    public static void getImages() throws IOException, SQLException {
+        Image.getImages();
     }
 }

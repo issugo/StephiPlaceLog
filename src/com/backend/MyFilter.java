@@ -1,5 +1,7 @@
 package com.backend;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
 
@@ -20,7 +22,7 @@ public class MyFilter extends FileFilter {
         return false;
     }
 
-    public boolean accept(File f) {
+    public boolean accept(@NotNull File f) {
         if (f.isDirectory())  return true;
         String suffixe = null;
         String s = f.getName();

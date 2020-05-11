@@ -11,14 +11,14 @@ import java.sql.Statement;
 public class Main {
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        /*try {
+        try {
             new Application();
         } catch(Exception e) {
             System.out.println(e.getMessage());
-        }*/
+        }
 
         //DEBUG
-        System.out.println(Client.find(1).isVendeur());
+        //System.out.println(Client.find(1).isVendeur());
         //FIN DEBUG
     }
 

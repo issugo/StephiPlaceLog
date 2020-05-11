@@ -3,10 +3,11 @@ package com.company;
 import javax.swing.*;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
+import java.io.IOException;
 import java.sql.SQLException;
 
 import com.backend.Client;
-import com.backend.Images;
+import com.backend.Image;
 
 public class ClientPanel extends JPanel {
 
@@ -88,7 +89,15 @@ public class ClientPanel extends JPanel {
         this.CIN = new JLabel("carte d'identite :");
         this.add(this.CIN);
         this.CINField = new JButton("images");
-        this.CINField.addActionListener(e -> getCartesIdentites());
+        this.CINField.addActionListener(e -> {
+            try {
+                getCartesIdentites();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        });
         this.add(this.CINField);
 
         //boutton de submit
@@ -101,8 +110,8 @@ public class ClientPanel extends JPanel {
 
     }
 
-    public static void getCartesIdentites() {
-        Images.getImage();
+    public static void getCartesIdentites() throws IOException, SQLException {
+        Image.getImages();
     }
 
 
