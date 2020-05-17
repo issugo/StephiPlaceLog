@@ -1,13 +1,16 @@
 package com.company;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import com.backend.Client;
 import com.backend.Image;
+import org.jetbrains.annotations.NotNull;
 
 public class ClientPanel extends JPanel {
 
@@ -20,7 +23,13 @@ public class ClientPanel extends JPanel {
 
     public ClientPanel() {
         this.choix1 = new JButton("voir les clients");
-        this.choix1.addActionListener(e -> showAllClients());
+        this.choix1.addActionListener(e -> {
+            try {
+                showAllClients();
+            } catch (SQLException | ClassNotFoundException throwables) {
+                throwables.printStackTrace();
+            }
+        });
         this.choix2 = new JButton("créer client");
         this.choix2.addActionListener(e -> {
             try {
@@ -35,12 +44,33 @@ public class ClientPanel extends JPanel {
         this.add(this.choix2);
     }
 
-    public void showAllClients() {
+    public void showAllClients() throws SQLException, ClassNotFoundException {
         this.removeAll();
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        //for (String client: Client.findAll().toString()) {
-        //    this.add(new JLabel(client));
-        //}
+        List<Client> allClient = Client.findAll();
+        this.setLayout(new GridLayout(allClient.size()/2,2));
+        this.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        for (Client client: allClient) {
+            JPanel temp = new JPanel();
+            temp.setLayout(new GridLayout(6, 2));
+            temp.add(new JLabel("id :"));
+            temp.add(new JLabel(String.valueOf(client.getId())));
+            temp.add(new JLabel("nom :"));
+            temp.add(new JLabel(client.getNom()));
+            temp.add(new JLabel("prenom :"));
+            temp.add(new JLabel(client.getPrenom()));
+            temp.add(new JLabel("email :"));
+            temp.add(new JLabel(client.getEmail()));
+            temp.add(new JLabel("telephone :"));
+            temp.add(new JLabel(client.getTelephone()));
+            temp.add(new JLabel("vendeur :"));
+            if (client.isVendeur()) {
+                temp.add(new JLabel("oui"));
+            } else {
+                temp.add(new JLabel("non"));
+            }
+            temp.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            this.add(temp);
+        }
         this.revalidate();
         this.repaint();
     }
@@ -92,10 +122,8 @@ public class ClientPanel extends JPanel {
         this.CINField.addActionListener(e -> {
             try {
                 getCartesIdentites();
-            } catch (IOException ioException) {
+            } catch (IOException | SQLException ioException) {
                 ioException.printStackTrace();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
             }
         });
         this.add(this.CINField);

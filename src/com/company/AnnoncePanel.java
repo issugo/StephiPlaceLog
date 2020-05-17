@@ -1,11 +1,14 @@
 package com.company;
 
+import com.backend.Agent;
 import com.backend.Annonce;
+import com.backend.Bien;
 import com.backend.Image;
 
 import java.awt.*;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import javax.swing.*;
 
 public class AnnoncePanel extends JPanel {
@@ -26,7 +29,13 @@ public class AnnoncePanel extends JPanel {
     public AnnoncePanel() {
 
         this.choix1 = new JButton("voir les annonces");
-        //this.choix1.addActionListener(e -> showAllAnnonces());
+        this.choix1.addActionListener(e -> {
+            try {
+                showAllAnnonces();
+            } catch (SQLException | ClassNotFoundException throwables) {
+                throwables.printStackTrace();
+            }
+        });
         this.choix2 = new JButton("créer annonce");
         this.choix2.addActionListener(e -> {
             try {
@@ -44,12 +53,43 @@ public class AnnoncePanel extends JPanel {
 
     public void showAllAnnonces() throws SQLException, ClassNotFoundException {
         this.removeAll();
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.setSize(500, 500);
-        this.setPreferredSize(new Dimension(500, 500));
-        /*
-         * voila quoi, faut afficher les annonces
-         */
+        List<Annonce> allAnnonces = Annonce.findAll();
+        this.setLayout(new GridLayout(allAnnonces.size()/2,2));
+        this.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        for (Annonce annonce: allAnnonces) {
+            JPanel temp = new JPanel();
+            temp.setLayout(new GridLayout(6, 2));
+            temp.add(new JLabel("id :"));
+            temp.add(new JLabel(String.valueOf(annonce.getId())));
+            temp.add(new JLabel("titre :"));
+            temp.add(new JLabel(annonce.getTitre()));
+            temp.add(new JLabel("nb_favoris :"));
+            temp.add(new JLabel(String.valueOf(annonce.getNb_favoris())));
+            temp.add(new JLabel("nb_visites :"));
+            temp.add(new JLabel(String.valueOf(annonce.getNb_visites())));
+            temp.add(new JLabel("id_bien :"));
+            JButton temp2 = new JButton(String.valueOf(annonce.getId_bien()));
+            temp2.addActionListener(e -> {
+                try {
+                    showBien(annonce.getId_bien());
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+            });
+            temp.add(temp2);
+            temp.add(new JLabel("agent :"));
+            temp2 = new JButton(String.valueOf(annonce.getId_agent()));
+            temp2.addActionListener(e -> {
+                try {
+                    showAgent(annonce.getId_agent());
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+            });
+            temp.add(temp2);
+            temp.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            this.add(temp);
+        }
         this.revalidate();
         this.repaint();
     }
@@ -148,10 +188,8 @@ public class AnnoncePanel extends JPanel {
         this.imagesField.addActionListener(e -> {
             try {
                 AnnoncePanel.getImages();
-            } catch (IOException ioException) {
+            } catch (IOException | SQLException ioException) {
                 ioException.printStackTrace();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
             }
         });
         this.add(this.images);
@@ -162,6 +200,82 @@ public class AnnoncePanel extends JPanel {
         this.submit = new JButton("submit");
         this.add(this.submit);
 
+        this.revalidate();
+        this.repaint();
+    }
+
+    public void showBien(Integer id) throws SQLException, ClassNotFoundException {
+        this.removeAll();
+        Bien bien = Bien.find(id);
+        this.setLayout(new GridLayout(14,2));
+        this.add(new JLabel("id :"));
+        this.add(new JLabel(String.valueOf(bien.getId())));
+        this.add(new JLabel("superficie :"));
+        this.add(new JLabel(String.valueOf(bien.getSuperficie())));
+        this.add(new JLabel("nb_pieces :"));
+        this.add(new JLabel(String.valueOf(bien.getNb_pieces())));
+        this.add(new JLabel("type :"));
+        this.add(new JLabel(bien.getType()));
+        this.add(new JLabel("description :"));
+        this.add(new JLabel(bien.getDescription()));
+        this.add(new JLabel("jardin :"));
+        if (bien.getJardin()) {
+            this.add(new JLabel("oui"));
+        } else {
+            this.add(new JLabel("non"));
+        }
+        this.add(new JLabel("cave :"));
+        if (bien.getCave()) {
+            this.add(new JLabel("oui"));
+        } else {
+            this.add(new JLabel("non"));
+        }
+        this.add(new JLabel("ceillier"));
+        if (bien.getCeillier()) {
+            this.add(new JLabel("oui"));
+        } else {
+            this.add(new JLabel("non"));
+        }
+        this.add(new JLabel("loggia :"));
+        if (bien.getLoggia()) {
+            this.add(new JLabel("oui"));
+        } else {
+            this.add(new JLabel("non"));
+        }
+        this.add(new JLabel("terrasse :"));
+        if (bien.getTerrasse()) {
+            this.add(new JLabel("oui"));
+        } else {
+            this.add(new JLabel("non"));
+        }
+        this.add(new JLabel("garage :"));
+        if (bien.getGarage()) {
+            this.add(new JLabel("oui"));
+        } else {
+            this.add(new JLabel("non"));
+        }
+        this.add(new JLabel("verranda :"));
+        if (bien.getVerranda()) {
+            this.add(new JLabel("oui"));
+        } else {
+            this.add(new JLabel("non"));
+        }
+        this.add(new JLabel("prix_min :"));
+        this.add(new JLabel(String.valueOf(bien.getPrix_min())));
+        this.add(new JLabel("frais_agence :"));
+        this.add(new JLabel(String.valueOf(bien.getFrais_agence())));
+        this.revalidate();
+        this.repaint();
+    }
+
+    public void showAgent(Integer id) throws SQLException, ClassNotFoundException {
+        this.removeAll();
+        Agent agent = Agent.find(id);
+        this.setLayout(new GridLayout(2,2));
+        this.add(new JLabel("id :"));
+        this.add(new JLabel(String.valueOf(agent.getId())));
+        this.add(new JLabel("code_agent :"));
+        this.add(new JLabel(String.valueOf(agent.getCode_agent())));
         this.revalidate();
         this.repaint();
     }

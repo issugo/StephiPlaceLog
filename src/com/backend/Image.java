@@ -8,6 +8,7 @@ public class Image {
 
     Integer id, id_bien;
     Blob binaries;
+    InputStream inBinaries;
 
     public Image() {
         this.id = null;
@@ -47,16 +48,41 @@ public class Image {
         return this.binaries;
     }
 
-    private boolean save() throws SQLException, ClassNotFoundException {
-        boolean retour = false;
+    public InputStream setInBinaries(InputStream in){
+        this.inBinaries = in;
+        return this.inBinaries;
+    }
+
+    public InputStream getInBinaries() {
+        return this.inBinaries;
+    }
+
+    public static Image find(Integer id) throws SQLException, ClassNotFoundException {
         Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
-        String query = "INSERT INTO image(image, id_bien) VALUES (" + this.getBinaries() + "," + this.getId_bien() + ")";
-        Integer test = db.insertOrUpdate(query);
+        String query = "SELECT * FROM image WHERE id = ";
+        query += id;
+        ResultSet result = db.select(query);
+        result.next();
+        Image instance = new Image();
+        instance.setId(result.getInt("id"));
+        instance.setId_bien(result.getInt("id_bien"));
+        instance.setBinaries(result.getBlob("image"));
+        return instance;
+    }
+
+    private boolean save() throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        String url = "jdbc:mysql://localhost:3306/stephiplacelog";
+        Connection con = DriverManager.getConnection(url, "root", "");
+        PreparedStatement pstmt = con.prepareStatement("INSERT INTO image(`image`, `id_bien`) VALUES(?, ?)");
+        pstmt.setBlob(1, this.inBinaries);
+        pstmt.setInt(2, this.getId_bien());
+        Integer test  = pstmt.executeUpdate();
         if (test > 1) {
             retour = true;
         }
-        db.close();
+        con.close();
         return retour;
     }
 
