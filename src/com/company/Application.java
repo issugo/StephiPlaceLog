@@ -13,13 +13,14 @@ public class Application extends JFrame{
     int width = (int)dimension.getWidth();
 
     //toolbar
-    JButton close, annoncesTrigger, clientsTrigger;
+    JButton close, annoncesTrigger, clientsTrigger, biensTrigger;
     JToolBar toolbar;
 
     //panel que l'on affiche
     JPanel mainPanel;
     AnnoncePanel annoncePanel;
     ClientPanel clientsPanel;
+    BienPanel bienPanel;
 
     public Application() throws Exception {
         //preparation des components
@@ -27,6 +28,7 @@ public class Application extends JFrame{
         this.mainPanel = new JPanel();
         this.annoncePanel = new AnnoncePanel();
         this.clientsPanel = new ClientPanel();
+        this.bienPanel = new BienPanel();
 
         //set css default
         UIManager.setLookAndFeel(new NimbusLookAndFeel());
@@ -47,7 +49,7 @@ public class Application extends JFrame{
         this.annoncesTrigger = new JButton("annonces");
         this.annoncesTrigger.addActionListener(e -> {
             //on enleve l'affichage du centre et mon met le formulaire de nouveau bien
-            save.afficherBienPanel();
+            save.afficherAnnoncePanel();
         });
         this.toolbar.add(this.annoncesTrigger);
         //set clients button
@@ -57,6 +59,13 @@ public class Application extends JFrame{
             save.afficherClientPanel();
         });
         this.toolbar.add(this.clientsTrigger);
+        //set biens button
+        this.biensTrigger = new JButton("biens");
+        this.biensTrigger.addActionListener(e -> {
+            //on enleve l'affichage du centre et mon met le formulaire de nouveau bien
+            save.afficherBienPanel();
+        });
+        this.toolbar.add(this.biensTrigger);
         //set close button
         this.close = new JButton(new ImageIcon( "icons/fermer.png"));
         this.close.addActionListener(e -> System.exit(0));
@@ -74,6 +83,7 @@ public class Application extends JFrame{
         try {
             this.annoncePanel = new AnnoncePanel();
             this.clientsPanel = new ClientPanel();
+            this.bienPanel = new BienPanel();
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }
@@ -83,17 +93,33 @@ public class Application extends JFrame{
         this.mainPanel.repaint();
     }
 
-    public void afficherBienPanel() {
-        this.mainPanel.removeAll();
-        this.mainPanel.add(annoncePanel, BorderLayout.CENTER);
-        this.mainPanel.revalidate();
-        this.mainPanel.repaint();
+    public void afficherAnnoncePanel() {
         try {
             this.annoncePanel = new AnnoncePanel();
             this.clientsPanel = new ClientPanel();
+            this.bienPanel = new BienPanel();
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }
+        this.mainPanel.removeAll();
+        this.mainPanel.add(this.annoncePanel, BorderLayout.CENTER);
+        this.mainPanel.revalidate();
+        this.mainPanel.repaint();
+    }
+
+    public void afficherBienPanel() {
+        try {
+            this.annoncePanel = new AnnoncePanel();
+            this.clientsPanel = new ClientPanel();
+            this.bienPanel = new BienPanel();
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
+        this.mainPanel.removeAll();
+        this.mainPanel.add(this.bienPanel, BorderLayout.CENTER);
+        this.mainPanel.revalidate();
+        this.mainPanel.repaint();
+
     }
 
 }

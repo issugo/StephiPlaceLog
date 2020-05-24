@@ -3,6 +3,7 @@ package com.backend;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -165,7 +166,7 @@ public class Bien {
         boolean retour = false;
         Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
-        String query = "INSERT INTO bien(superficie, nb_pieces, type, description, jardin, cave, ceillier, loggia, terrasse, garage, verranda, prix_min, frais_agence) VALUES (" + this.getSuperficie() + "," + this.getNb_pieces() + "," + this.getType() + "," + this.getDescription() + "," + this.getJardin() + "," + this.getCave() + "," + this.getCeillier() + "," + this.getLoggia() + "," + this.getTerrasse() + "," + this.getGarage() + "," + this.getVerranda() + "," + this.getPrix_min() + "," + this.getFrais_agence() + ")";
+        String query = "INSERT INTO bien(superficie, nb_pieces, type, description, jardin, cave, ceillier, loggia, terrasse, garage, verranda, prix_min, frais_agence) VALUES (" + this.getSuperficie() + "," + this.getNb_pieces() + ",'" + this.getType() + "','" + this.getDescription() + "'," + this.getJardin() + "," + this.getCave() + "," + this.getCeillier() + "," + this.getLoggia() + "," + this.getTerrasse() + "," + this.getGarage() + "," + this.getVerranda() + "," + this.getPrix_min() + "," + this.getFrais_agence() + ")";
         Integer test = db.insertOrUpdate(query);
         if (test > 1) {
             retour = true;
@@ -222,6 +223,7 @@ public class Bien {
         instance.setVerranda(result.getBoolean("verranda"));
         instance.setPrix_min(result.getFloat("prix_min"));
         instance.setFrais_agence(result.getFloat("frais_agence"));
+        db.close();
         return instance;
     }
 
@@ -249,7 +251,33 @@ public class Bien {
             instance.setFrais_agence(result.getFloat("frais_agence"));
             retour.add(instance);
         }
+        db.close();
         return retour;
     }
 
+    public static boolean hasAnnonce(Integer id) throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "select * from annonce where id_bien = " + id;
+        ResultSet result = db.select(query);
+        ResultSetMetaData meta = result.getMetaData();
+        while (result.next()) {
+            retour = true;
+        }
+        return retour;
+    }
+
+    public boolean hasAnnonce() throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "select * from annonce where id_bien = " + this.getId();
+        ResultSet result = db.select(query);
+        ResultSetMetaData meta = result.getMetaData();
+        while (result.next()) {
+            retour = true;
+        }
+        return retour;
+    }
 }

@@ -118,7 +118,8 @@ public class Annonce {
         boolean retour = false;
         Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
-        String query = "INSERT INTO annonce(id_bien, id_agent, nb_favoris, nb_visites, titre) VALUES (" + this.getId_bien() + "," + this.getId_agent() + "," + this.getNb_favoris() + "," + this.getNb_visites() + "," + this.getTitre() + ")";
+        String query = "INSERT INTO annonce(id_bien, id_agent, nb_favoris, nb_visites, titre) VALUES (" + this.getId_bien() + "," + this.getId_agent() + "," + this.getNb_favoris() + "," + this.getNb_visites() + ",'" + this.getTitre() + "');";
+        System.out.println(query);
         Integer test = db.insertOrUpdate(query);
         if (test > 1) {
             retour = true;
