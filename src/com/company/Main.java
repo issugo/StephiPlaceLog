@@ -1,15 +1,14 @@
 package com.company;
 
-import java.sql.SQLException;
-
 /**
  * Main classe du projet
  */
 public class Main {
 
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+    public static void main(String[] args) {
         try {
-            new Application();
+            //new Application();
+            new ConnexionPanel();
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }

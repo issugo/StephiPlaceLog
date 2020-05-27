@@ -325,10 +325,8 @@ public class AnnoncePanel extends JPanel {
             }
             try {
                 temp3.save();
-            } catch (SQLException throwables) {
+            } catch (SQLException | ClassNotFoundException throwables) {
                 throwables.printStackTrace();
-            } catch (ClassNotFoundException classNotFoundException) {
-                classNotFoundException.printStackTrace();
             }
 
         });
