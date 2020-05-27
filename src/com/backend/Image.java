@@ -149,15 +149,13 @@ public class Image {
     }
 
     /**
-     * methode pour récupérer les liens d'images à upload
+     * methode pour récupérer plusieurs liens d'images à upload
      * @return une List de lien
      * @throws IOException
      * @throws SQLException
      */
     public static List<String> getImages() throws IOException, SQLException {
         List<String> allLiens = new ArrayList<>();
-        String url = "jdbc:mysql://localhost:3306/stephiplacelog";
-        Connection con = DriverManager.getConnection(url, "root", "");
         JFileChooser choix = new JFileChooser();
         choix.setMultiSelectionEnabled(true);
         MyFilter mf = new MyFilter(new String[] {"gif", "jpeg", "tif", "jpg", "png"}, "fichiers images");
@@ -173,5 +171,28 @@ public class Image {
             System.out.println("aucun fichier choisi");
         }
         return allLiens;
+    }
+
+    /**
+     * methode pour récupérer un lien d'images à upload
+     * @return une List de lien
+     * @throws IOException
+     * @throws SQLException
+     */
+    public static String getImage() throws IOException, SQLException {
+        String lien = null;
+        JFileChooser choix = new JFileChooser();
+        choix.setMultiSelectionEnabled(false);
+        MyFilter mf = new MyFilter(new String[] {"gif", "jpeg", "tif", "jpg", "png"}, "fichiers images");
+        choix.setFileFilter(mf);
+        int retour = choix.showOpenDialog(choix);
+        if (retour == JFileChooser.APPROVE_OPTION) {
+            //fichiers choisis donc sortie = OK
+            File fs = choix.getSelectedFile();
+            lien = fs.getAbsolutePath();
+        } else {
+            System.out.println("aucun fichier choisi");
+        }
+        return lien;
     }
 }

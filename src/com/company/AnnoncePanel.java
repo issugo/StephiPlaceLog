@@ -1,8 +1,6 @@
 package com.company;
 
-import com.backend.Agent;
-import com.backend.Annonce;
-import com.backend.Bien;
+import com.backend.*;
 import com.backend.Image;
 
 import java.awt.*;
@@ -234,7 +232,7 @@ public class AnnoncePanel extends JPanel {
     public void showBien(Integer id) throws SQLException, ClassNotFoundException {
         this.removeAll();
         Bien bien = Bien.find(id);
-        this.setLayout(new GridLayout(14,2));
+        this.setLayout(new GridLayout(15,2));
         this.add(new JLabel("id :"));
         this.add(new JLabel(String.valueOf(bien.getId())));
         this.add(new JLabel("superficie :"));
@@ -291,6 +289,8 @@ public class AnnoncePanel extends JPanel {
         this.add(new JLabel(String.valueOf(bien.getPrix_min())));
         this.add(new JLabel("frais_agence :"));
         this.add(new JLabel(String.valueOf(bien.getFrais_agence())));
+        this.add(new JLabel("email vendeur :"));
+        this.add(new JLabel(Vendeur.find(bien.getIdVendeur()).findClient().getEmail()));
         this.revalidate();
         this.repaint();
     }

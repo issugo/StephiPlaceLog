@@ -3,12 +3,17 @@ package com.company;
 import javax.swing.*;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
 import com.backend.Client;
 import com.backend.Image;
+import com.backend.Vendeur;
 
 /**
  * Classe du panel des clients
@@ -129,12 +134,13 @@ public class ClientPanel extends JPanel {
         this.add(this.passwordField);
 
         //ajout carte identite
+        final String[] lienImage = {null};
         this.CIN = new JLabel("carte d'identite :");
         this.add(this.CIN);
         this.CINField = new JButton("images");
         this.CINField.addActionListener(e -> {
             try {
-                getCartesIdentites();
+                lienImage[0] = Image.getImage();
             } catch (IOException | SQLException ioException) {
                 ioException.printStackTrace();
             }
@@ -143,6 +149,43 @@ public class ClientPanel extends JPanel {
 
         //boutton de submit
         this.submit = new JButton("submit");
+        this.submit.addActionListener(e -> {
+            Client temp = new Client();
+            temp.setNom(this.nomField.getText());
+            temp.setPrenom(this.prenomField.getText());
+            temp.setEmail(this.emailField.getText());
+            temp.setTelephone(this.telField.getText());
+            temp.setPassword(this.passwordField.getText());
+            try {
+                temp.save();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            } catch (ClassNotFoundException classNotFoundException) {
+                classNotFoundException.printStackTrace();
+            }
+            Integer idTemp = null;
+            try {
+                idTemp = Client.findByEmail(this.emailField.getText()).getId();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            } catch (ClassNotFoundException classNotFoundException) {
+                classNotFoundException.printStackTrace();
+            }
+            Vendeur temp2 = new Vendeur();
+            temp2.setIdClient(idTemp);
+            try {
+                temp2.setCINTemp(new FileInputStream(lienImage[0]));
+            } catch (FileNotFoundException fileNotFoundException) {
+                fileNotFoundException.printStackTrace();
+            }
+            try {
+                temp2.save();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            } catch (ClassNotFoundException classNotFoundException) {
+                classNotFoundException.printStackTrace();
+            }
+        });
         this.add(new JPanel());
         this.add(this.submit);
 
@@ -150,16 +193,4 @@ public class ClientPanel extends JPanel {
         this.repaint();
 
     }
-
-    /**
-     * methode pour récuperer la carte d'identité
-     * @throws IOException
-     * @throws SQLException
-     */
-    public static void getCartesIdentites() throws IOException, SQLException {
-        Image.getImages();
-    }
-
-
-
 }

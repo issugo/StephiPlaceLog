@@ -1,8 +1,7 @@
 package com.backend;
 
-import java.sql.Blob;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.InputStream;
+import java.sql.*;
 
 /**
  * Classe Vendeur pour les clients autorisés
@@ -10,6 +9,7 @@ import java.sql.SQLException;
 public class Vendeur {
     Integer id, id_client;
     Blob CIN;
+    InputStream CINTemp;
 
     /**
      * constructeur
@@ -18,6 +18,7 @@ public class Vendeur {
         this.id = null;
         this.id_client = null;
         this.CIN = null;
+        this.CINTemp = null;
     }
 
     /**
@@ -57,6 +58,24 @@ public class Vendeur {
     }
 
     /**
+     * setter de l'InputStream de la carte d'identite
+     * @param CINTemp
+     * @return l'InputStream
+     */
+    public InputStream setCINTemp(InputStream CINTemp) {
+        this.CINTemp = CINTemp;
+        return this.CINTemp;
+    }
+
+    /**
+     * getter de l'InputStream de la carte d'identite
+     * @return l'InputStream
+     */
+    public InputStream getCINTemp() {
+        return this.CINTemp;
+    }
+
+    /**
      * setter de l'id  du client qui est vendeur
      * @param idClient
      * @return l'id du client
@@ -72,6 +91,21 @@ public class Vendeur {
      */
     public Integer getIdClient() {
         return this.id_client;
+    }
+
+    public boolean save() throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        String url = "jdbc:mysql://localhost:3306/stephiplacelog";
+        Connection con = DriverManager.getConnection(url, "root", "");
+        PreparedStatement pstmt = con.prepareStatement("INSERT INTO vendeur(`id_Client`, `carte_identite`) VALUES(?, ?)");
+        pstmt.setBlob(2, this.getCINTemp());
+        pstmt.setInt(1, this.getIdClient());
+        Integer test  = pstmt.executeUpdate();
+        if (test > 1) {
+            retour = true;
+        }
+        con.close();
+        return retour;
     }
 
     /**

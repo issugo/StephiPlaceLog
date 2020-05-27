@@ -155,7 +155,7 @@ public class Client {
         boolean retour = false;
         Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
-        String query = "INSERT INTO client(nom, prenom, email, telephone, password) VALUES ('" + this.getNom() + "','" + this.getPrenom() + "','" + this.getEmail() + "'," + this.getTelephone() + ",'" + this.getPassword() + "')";
+        String query = "INSERT INTO client(nom, prenom, email, telephone, password) VALUES ('" + this.getNom() + "','" + this.getPrenom() + "','" + this.getEmail() + "','" + this.getTelephone() + "','" + this.getPassword() + "')";
         Integer test = db.insertOrUpdate(query);
         if (test > 1) {
             retour = true;
