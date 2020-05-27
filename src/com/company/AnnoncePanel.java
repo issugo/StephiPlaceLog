@@ -11,6 +11,9 @@ import java.sql.SQLException;
 import java.util.List;
 import javax.swing.*;
 
+/**
+ * Classe du panel des annonces
+ */
 public class AnnoncePanel extends JPanel {
 
     JButton choix1, choix2;
@@ -26,6 +29,9 @@ public class AnnoncePanel extends JPanel {
 
     String[] myTypeTab = {"maison", "appartement"};
 
+    /**
+     * constructeur
+     */
     public AnnoncePanel() {
 
         this.choix1 = new JButton("voir les annonces");
@@ -51,11 +57,23 @@ public class AnnoncePanel extends JPanel {
 
     }
 
+    /**
+     * methode pour faire afficher toutes les annonces
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public void showAllAnnonces() throws SQLException, ClassNotFoundException {
+        // suppression de tout les components actuellement présents
         this.removeAll();
+
+        // recupere toute les annonces
         List<Annonce> allAnnonces = Annonce.findAll();
+
+        // set l'affichage
         this.setLayout(new GridLayout(allAnnonces.size()/2,2));
         this.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+
+        // affichage annonce par annonce
         for (Annonce annonce: allAnnonces) {
             JPanel temp = new JPanel();
             temp.setLayout(new GridLayout(6, 2));
@@ -78,7 +96,7 @@ public class AnnoncePanel extends JPanel {
             });
             temp.add(temp2);
             temp.add(new JLabel("agent :"));
-            temp2 = new JButton(String.valueOf(annonce.getId_agent()));
+            temp2 = new JButton(String.valueOf(Agent.find(annonce.getId_agent()).getCode_agent()));
             temp2.addActionListener(e -> {
                 try {
                     showAgent(annonce.getId_agent());
@@ -94,6 +112,9 @@ public class AnnoncePanel extends JPanel {
         this.repaint();
     }
 
+    /**
+     *
+     */
     public void showCreateAnnonceForm() {
         this.removeAll();
         // setup layout
@@ -204,6 +225,12 @@ public class AnnoncePanel extends JPanel {
         this.repaint();
     }
 
+    /**
+     * methode pour afficher un bien en fonction de son id
+     * @param id
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public void showBien(Integer id) throws SQLException, ClassNotFoundException {
         this.removeAll();
         Bien bien = Bien.find(id);
@@ -268,6 +295,12 @@ public class AnnoncePanel extends JPanel {
         this.repaint();
     }
 
+    /**
+     * affiche un agent en fonction de son id
+     * @param id
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public void showAgent(Integer id) throws SQLException, ClassNotFoundException {
         this.removeAll();
         Agent agent = Agent.find(id);
@@ -280,6 +313,11 @@ public class AnnoncePanel extends JPanel {
         this.repaint();
     }
 
+    /**
+     * methode pour appeler la recuperation d'images
+     * @throws IOException
+     * @throws SQLException
+     */
     public static void getImages() throws IOException, SQLException {
         Image.getImages();
     }

@@ -5,16 +5,29 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
 
+/**
+ * classe de filtre pour la récupération de fichier
+ */
 public class MyFilter extends FileFilter {
 
     String [] lesSuffixes;
     String  laDescription;
 
+    /**
+     * constructeur
+     * @param lesSuffixes
+     * @param laDescription
+     */
     public MyFilter(String []lesSuffixes, String laDescription){
         this.lesSuffixes = lesSuffixes;
         this.laDescription = laDescription;
     }
 
+    /**
+     * vérifie que le suffixe est autorisé
+     * @param suffixe
+     * @return un boolean de verifiation
+     */
     boolean appartient(String suffixe){
         for (String lesSuffix : lesSuffixes)
             if (suffixe.equals(lesSuffix))
@@ -22,6 +35,11 @@ public class MyFilter extends FileFilter {
         return false;
     }
 
+    /**
+     *
+     * @param f
+     * @return un boolean d'acceptation
+     */
     public boolean accept(@NotNull File f) {
         if (f.isDirectory())  return true;
         String suffixe = null;
@@ -32,7 +50,10 @@ public class MyFilter extends FileFilter {
         return suffixe!=null&&appartient(suffixe);
     }
 
-    // la description du filtre
+    /**
+     * getter de la description du filtre
+     * @return la description du filtre
+     */
     public String getDescription() {
         return laDescription;
     }

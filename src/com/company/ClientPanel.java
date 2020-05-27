@@ -1,7 +1,6 @@
 package com.company;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.io.IOException;
@@ -10,8 +9,10 @@ import java.util.List;
 
 import com.backend.Client;
 import com.backend.Image;
-import org.jetbrains.annotations.NotNull;
 
+/**
+ * Classe du panel des clients
+ */
 public class ClientPanel extends JPanel {
 
     JButton choix1, choix2;
@@ -21,6 +22,9 @@ public class ClientPanel extends JPanel {
     JButton CINField, submit;
     JFormattedTextField telField;
 
+    /**
+     * constructeur
+     */
     public ClientPanel() {
         this.choix1 = new JButton("voir les clients");
         this.choix1.addActionListener(e -> {
@@ -44,6 +48,11 @@ public class ClientPanel extends JPanel {
         this.add(this.choix2);
     }
 
+    /**
+     * methode pour afficher tout les clients
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public void showAllClients() throws SQLException, ClassNotFoundException {
         this.removeAll();
         List<Client> allClient = Client.findAll();
@@ -75,6 +84,10 @@ public class ClientPanel extends JPanel {
         this.repaint();
     }
 
+    /**
+     * methode pour créer un client en tant que vendeur
+     * @throws Exception
+     */
     public void showCreateVendeurForm() throws Exception {
         this.removeAll();
         this.setLayout(new GridLayout(9,2));
@@ -138,6 +151,11 @@ public class ClientPanel extends JPanel {
 
     }
 
+    /**
+     * methode pour récuperer la carte d'identité
+     * @throws IOException
+     * @throws SQLException
+     */
     public static void getCartesIdentites() throws IOException, SQLException {
         Image.getImages();
     }

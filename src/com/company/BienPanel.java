@@ -1,21 +1,29 @@
 package com.company;
 
-import com.backend.Annonce;
-import com.backend.Bien;
-import com.backend.Mysql;
+import com.backend.*;
+import com.backend.Image;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe d'affichage du panel des biens
+ */
 public class BienPanel extends JPanel {
     JButton choix1, choix2, choix3;
 
+    /**
+     * constructeur
+     */
     public BienPanel() {
         this.choix1 = new JButton("voir tout les biens");
         this.choix1.addActionListener(e -> {
@@ -34,13 +42,13 @@ public class BienPanel extends JPanel {
             }
         });
         this.choix3 = new JButton("créer bien");
-        /*this.choix3.addActionListener(e -> {
+        this.choix3.addActionListener(e -> {
             try {
-                showCreateAnnonceForm();
+                showCreateBienForm();
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
-        });*/
+        });
 
         this.setLayout(new GridLayout(1, 3));
         this.add(this.choix1);
@@ -48,6 +56,11 @@ public class BienPanel extends JPanel {
         this.add(this.choix3);
     }
 
+    /**
+     * methode pour afficher tout les biens
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public void showAllBiens() throws SQLException, ClassNotFoundException {
         this.removeAll();
         List<Bien> allBiens = Bien.findAll();
@@ -55,7 +68,7 @@ public class BienPanel extends JPanel {
         this.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         for (Bien bien: allBiens) {
             JPanel temp = new JPanel();
-            temp.setLayout(new GridLayout(14,2));
+            temp.setLayout(new GridLayout(15,2));
             temp.add(new JLabel("id :"));
             temp.add(new JLabel(String.valueOf(bien.getId())));
             temp.add(new JLabel("superficie :"));
@@ -112,6 +125,8 @@ public class BienPanel extends JPanel {
             temp.add(new JLabel(String.valueOf(bien.getPrix_min())));
             temp.add(new JLabel("frais_agence :"));
             temp.add(new JLabel(String.valueOf(bien.getFrais_agence())));
+            temp.add(new JLabel("email vendeur :"));
+            temp.add(new JLabel(Vendeur.find(bien.getIdVendeur()).findClient().getEmail()));
             temp.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             this.add(temp);
         }
@@ -119,6 +134,11 @@ public class BienPanel extends JPanel {
         this.repaint();
     }
 
+    /**
+     * methode pour afficher les biens qui n'ont pas d'annonces
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public void showAllBiensWithoutAnnonce() throws SQLException, ClassNotFoundException {
         this.removeAll();
         List<Bien> allBiens = Bien.findAll();
@@ -199,6 +219,10 @@ public class BienPanel extends JPanel {
         this.repaint();
     }
 
+    /**
+     * methode pour afficher le formulaire de creation d'annonce pour les biens qui n'en avaient pas
+     * @param id
+     */
     public void showFormAnnonce(Integer id) {
         this.removeAll();
         System.out.println(id);
@@ -249,14 +273,224 @@ public class BienPanel extends JPanel {
                 annonce.setId_bien(id);
                 try {
                     annonce.save();
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        });
+        this.add(temp);
+        this.revalidate();
+        this.repaint();
+    }
+
+    /**
+     * methode pour afficher le formulaire de création de bien
+     */
+    public void showCreateBienForm() {
+        this.removeAll();
+        // setup layout
+        this.setLayout(new GridLayout(16, 2));
+        this.setSize(500, 500);
+        this.setPreferredSize(new Dimension(500, 500));
+
+        // add superficie
+        JLabel superficie = new JLabel("superficie :");
+        JTextField superficieField = new JTextField();
+        this.add(superficie);
+        this.add(superficieField);
+
+        // add nb_pieces
+        JLabel nbPieces = new JLabel("nombre de pieces :");
+        SpinnerNumberModel pieceModel = new SpinnerNumberModel(0, 0, 20, 1);
+        JSpinner nbPiecesField = new JSpinner(pieceModel);
+        this.add(nbPieces);
+        this.add(nbPiecesField);
+
+        // add type
+        JLabel type = new JLabel("type : ");
+        String[] myTypeTab = {"maison", "appartement"};
+        JComboBox typeField = new JComboBox<>(myTypeTab);
+        this.add(type);
+        this.add(typeField);
+
+        // add description
+        JLabel description = new JLabel("description : ");
+        JTextField descriptionField = new JTextField();
+        this.add(description);
+        this.add(descriptionField);
+
+        // add jardin
+        JLabel jardin = new JLabel("jardin : ");
+        JCheckBox jardinField = new JCheckBox();
+        this.add(jardin);
+        this.add(jardinField);
+
+        // add cave
+        JLabel cave = new JLabel("cave : ");
+        JCheckBox caveField = new JCheckBox();
+        this.add(cave);
+        this.add(caveField);
+
+        // add ceillier
+        JLabel ceillier = new JLabel("ceillier : ");
+        JCheckBox ceillierField = new JCheckBox();
+        this.add(ceillier);
+        this.add(ceillierField);
+
+        // add loggia
+        JLabel loggia = new JLabel("loggia : ");
+        JCheckBox loggiaField = new JCheckBox();
+        this.add(loggia);
+        this.add(loggiaField);
+
+        // add terrasse
+        JLabel terrasse = new JLabel("terrasse : ");
+        JCheckBox terrasseField = new JCheckBox();
+        this.add(terrasse);
+        this.add(terrasseField);
+
+        // add garage
+        JLabel garage = new JLabel("garage : ");
+        JCheckBox garageField = new JCheckBox();
+        this.add(garage);
+        this.add(garageField);
+
+        // add verranda
+        JLabel verranda = new JLabel("verranda : ");
+        JCheckBox verrandaField = new JCheckBox();
+        this.add(verranda);
+        this.add(verrandaField);
+
+        // add prixMin
+        JLabel prixMin = new JLabel("prix minimum : ");
+        SpinnerNumberModel prixModel = new SpinnerNumberModel(0, 0, 999999999, 0.01);
+        JSpinner prixMinField = new JSpinner(prixModel);
+        this.add(prixMin);
+        this.add(prixMinField);
+
+        // add frais-agence
+        JLabel fraisAgence = new JLabel("frais agence : ");
+        SpinnerNumberModel fraisModel = new SpinnerNumberModel(0, 0, 999999999, 0.01);
+        JSpinner fraisAgenceField = new JSpinner(fraisModel);
+        this.add(fraisAgence);
+        this.add(fraisAgenceField);
+
+        // add email vendeur
+        JLabel emailVendeur = new JLabel("email vendeur : ");
+        JTextField emailVendeurField = new JTextField();
+        this.add(emailVendeur);
+        this.add(emailVendeurField);
+
+        // add images
+        List<String> liensImage = new ArrayList<>();
+        JLabel images = new JLabel("image(s) : ");
+        JButton imagesField = new JButton("image(s)");
+        imagesField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    for(String lien: Image.getImages()) {
+                        liensImage.add(lien);
+                    }
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        });
+        this.add(images);
+        this.add(imagesField);
+
+        //boutton submit
+        this.add(new JPanel());
+        JButton submit = new JButton("submit");
+        submit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Client clientTemp = new Client();
+                try {
+                    clientTemp = Client.findByEmail(emailVendeurField.getText());
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 } catch (ClassNotFoundException classNotFoundException) {
                     classNotFoundException.printStackTrace();
                 }
+                try {
+                    if(!clientTemp.isVendeur()) {
+                        JOptionPane.showMessageDialog(new JFrame(), "le client n'est pas vendeur");
+                    }
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+                if(clientTemp == null) {
+                    return;
+                }
+                Bien temp = new Bien();
+                temp.setSuperficie(Float.valueOf(superficieField.getText()));
+                temp.setFrais_agence(Float.valueOf(fraisAgenceField.getValue().toString()));
+                temp.setPrix_min(Float.valueOf(prixMinField.getValue().toString()));
+                temp.setVerranda(verrandaField.isSelected());
+                temp.setTerrasse(terrasseField.isSelected());
+                temp.setLoggia(loggiaField.isSelected());
+                temp.setCeillier(ceillierField.isSelected());
+                temp.setJardin(jardinField.isSelected());
+                temp.setDescription(descriptionField.getText());
+                temp.setType(typeField.getSelectedItem().toString());
+                temp.setNb_pieces((Integer)nbPiecesField.getValue());
+                temp.setCave(caveField.isSelected());
+                temp.setGarage(garageField.isSelected());
+                try {
+                    temp.setIdVendeur(Vendeur.findByIdClient(clientTemp.getId()).getId());
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+                try {
+                    temp.save();
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+                Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+                try {
+                    db.connect();
+                } catch (ClassNotFoundException | SQLException classNotFoundException) {
+                    classNotFoundException.printStackTrace();
+                }
+                ResultSet recuperationId = null;
+                try {
+                    recuperationId = db.select("SELECT * FROM bien ORDER BY id DESC LIMIT 1;");
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+                try {
+                    recuperationId.next();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+                Integer id = null;
+                try {
+                     id = recuperationId.getInt("id");
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+                for(String lien: liensImage) {
+                    Image temp2 = new Image();
+                    try {
+                        temp2.setInBinaries(new FileInputStream(lien));
+                    } catch (FileNotFoundException fileNotFoundException) {
+                        fileNotFoundException.printStackTrace();
+                    }
+                    temp2.setId_bien(id);
+                    try {
+                        temp2.save();
+                    } catch (SQLException | ClassNotFoundException throwables) {
+                        throwables.printStackTrace();
+                    }
+                }
+
             }
         });
-        this.add(temp);
+        this.add(submit);
         this.revalidate();
         this.repaint();
     }

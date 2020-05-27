@@ -4,6 +4,9 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
+/**
+ * Classe principale de l'application
+ */
 public class Application extends JFrame{
 
     //main variable de l'app
@@ -22,6 +25,10 @@ public class Application extends JFrame{
     ClientPanel clientsPanel;
     BienPanel bienPanel;
 
+    /**
+     * constructeur
+     * @throws Exception
+     */
     public Application() throws Exception {
         //preparation des components
         this.save = this;
@@ -79,6 +86,9 @@ public class Application extends JFrame{
         setVisible(true);
     }
 
+    /**
+     * methode pour afficher le panel client
+     */
     public void afficherClientPanel() {
         try {
             this.annoncePanel = new AnnoncePanel();
@@ -93,6 +103,9 @@ public class Application extends JFrame{
         this.mainPanel.repaint();
     }
 
+    /**
+     * methode pour afficher le panel des annonces
+     */
     public void afficherAnnoncePanel() {
         try {
             this.annoncePanel = new AnnoncePanel();
@@ -107,6 +120,9 @@ public class Application extends JFrame{
         this.mainPanel.repaint();
     }
 
+    /**
+     * methode pour afficher le panel des biens
+     */
     public void afficherBienPanel() {
         try {
             this.annoncePanel = new AnnoncePanel();
