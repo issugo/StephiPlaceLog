@@ -73,4 +73,24 @@ public class Agent {
         instance.setCode_agent(result.getInt("code_agent"));
         return instance;
     }
+
+    /**
+     * methode static findByCodeAgent qui retourne une instance de l'agent trouvé en base de données en fonction du code de l'agent
+     * @param code_agent
+     * @return une instance de Agent
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public static Agent findByCodeAgent(Integer code_agent) throws SQLException, ClassNotFoundException {
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "SELECT * FROM agent WHERE code_agent = ";
+        query += code_agent;
+        ResultSet result = db.select(query);
+        result.next();
+        Agent instance = new Agent();
+        instance.setId(result.getInt("id"));
+        instance.setCode_agent(result.getInt("code_agent"));
+        return instance;
+    }
 }

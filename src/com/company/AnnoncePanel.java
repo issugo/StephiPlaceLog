@@ -4,9 +4,16 @@ import com.backend.*;
 import com.backend.Image;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.*;
 
 /**
@@ -15,17 +22,6 @@ import javax.swing.*;
 public class AnnoncePanel extends JPanel {
 
     JButton choix1, choix2;
-
-    JLabel superficie, nbPieces, type, description, jardin, cave, ceillier, loggia, terrasse, garage, verranda, prixMin, prixVente, images;
-    JTextField descriptionField;
-    JCheckBox jardinField, caveField, ceillierField, loggiaField, terrasseField, garageField, verrandaField;
-    JComboBox<String> typeField;
-    JSpinner nbPiecesField, prixMinField, prixVenteField;
-    SpinnerModel pieceModel, prixModel;
-    JTextField superficieField;
-    JButton imagesField, submit;
-
-    String[] myTypeTab = {"maison", "appartement"};
 
     /**
      * constructeur
@@ -116,109 +112,227 @@ public class AnnoncePanel extends JPanel {
     public void showCreateAnnonceForm() {
         this.removeAll();
         // setup layout
-        this.setLayout(new GridLayout(15, 2));
+        this.setLayout(new GridLayout(18, 2));
         this.setSize(500, 500);
         this.setPreferredSize(new Dimension(500, 500));
 
         // add superficie
-        this.superficie = new JLabel("superficie :");
-        this.superficieField = new JTextField();
-        this.add(this.superficie);
-        this.add(this.superficieField);
+        JLabel superficie = new JLabel("superficie :");
+        JTextField superficieField = new JTextField();
+        this.add(superficie);
+        this.add(superficieField);
 
         // add nb_pieces
-        this.nbPieces = new JLabel("nombre de pieces :");
-        this.pieceModel = new SpinnerNumberModel(0, 0, 20, 1);
-        this.nbPiecesField = new JSpinner(this.pieceModel);
-        this.add(this.nbPieces);
-        this.add(this.nbPiecesField);
+        JLabel nbPieces = new JLabel("nombre de pieces :");
+        SpinnerNumberModel pieceModel = new SpinnerNumberModel(0, 0, 20, 1);
+        JSpinner nbPiecesField = new JSpinner(pieceModel);
+        this.add(nbPieces);
+        this.add(nbPiecesField);
 
         // add type
-        this.type = new JLabel("type : ");
-        this.typeField = new JComboBox<>(this.myTypeTab);
-        this.add(this.type);
-        this.add(this.typeField);
+        JLabel type = new JLabel("type : ");
+        String[] myTypeTab = {"maison", "appartement"};
+        JComboBox typeField = new JComboBox<>(myTypeTab);
+        this.add(type);
+        this.add(typeField);
 
         // add description
-        this.description = new JLabel("description : ");
-        this.descriptionField = new JTextField();
-        this.add(this.description);
-        this.add(this.descriptionField);
+        JLabel description = new JLabel("description : ");
+        JTextField descriptionField = new JTextField();
+        this.add(description);
+        this.add(descriptionField);
 
         // add jardin
-        this.jardin = new JLabel("jardin : ");
-        this.jardinField = new JCheckBox();
-        this.add(this.jardin);
-        this.add(this.jardinField);
+        JLabel jardin = new JLabel("jardin : ");
+        JCheckBox jardinField = new JCheckBox();
+        this.add(jardin);
+        this.add(jardinField);
 
         // add cave
-        this.cave = new JLabel("cave : ");
-        this.caveField = new JCheckBox();
-        this.add(this.cave);
-        this.add(this.caveField);
+        JLabel cave = new JLabel("cave : ");
+        JCheckBox caveField = new JCheckBox();
+        this.add(cave);
+        this.add(caveField);
 
         // add ceillier
-        this.ceillier = new JLabel("ceillier : ");
-        this.ceillierField = new JCheckBox();
-        this.add(this.ceillier);
-        this.add(this.ceillierField);
+        JLabel ceillier = new JLabel("ceillier : ");
+        JCheckBox ceillierField = new JCheckBox();
+        this.add(ceillier);
+        this.add(ceillierField);
 
         // add loggia
-        this.loggia = new JLabel("loggia : ");
-        this.loggiaField = new JCheckBox();
-        this.add(this.loggia);
-        this.add(this.loggiaField);
+        JLabel loggia = new JLabel("loggia : ");
+        JCheckBox loggiaField = new JCheckBox();
+        this.add(loggia);
+        this.add(loggiaField);
 
         // add terrasse
-        this.terrasse = new JLabel("terrasse : ");
-        this.terrasseField = new JCheckBox();
-        this.add(this.terrasse);
-        this.add(this.terrasseField);
+        JLabel terrasse = new JLabel("terrasse : ");
+        JCheckBox terrasseField = new JCheckBox();
+        this.add(terrasse);
+        this.add(terrasseField);
 
         // add garage
-        this.garage = new JLabel("garage : ");
-        this.garageField = new JCheckBox();
-        this.add(this.garage);
-        this.add(this.garageField);
+        JLabel garage = new JLabel("garage : ");
+        JCheckBox garageField = new JCheckBox();
+        this.add(garage);
+        this.add(garageField);
 
         // add verranda
-        this.verranda = new JLabel("verranda : ");
-        this.verrandaField = new JCheckBox();
-        this.add(this.verranda);
-        this.add(this.verrandaField);
+        JLabel verranda = new JLabel("verranda : ");
+        JCheckBox verrandaField = new JCheckBox();
+        this.add(verranda);
+        this.add(verrandaField);
 
         // add prixMin
-        this.prixMin = new JLabel("prix minimum : ");
-        this.prixModel = new SpinnerNumberModel(0, 0, 999999999, 0.01);
-        this.prixMinField = new JSpinner(prixModel);
-        this.add(this.prixMin);
-        this.add(this.prixMinField);
+        JLabel prixMin = new JLabel("prix minimum : ");
+        SpinnerNumberModel prixModel = new SpinnerNumberModel(0, 0, 999999999, 0.01);
+        JSpinner prixMinField = new JSpinner(prixModel);
+        this.add(prixMin);
+        this.add(prixMinField);
 
-        // add prixVente
-        this.prixVente = new JLabel("prix de vente : ");
-        this.prixModel = new SpinnerNumberModel(0, 0, 999999999, 0.01);
-        this.prixVenteField = new JSpinner(prixModel);
-        this.add(this.prixVente);
-        this.add(this.prixVenteField);
+        // add frais-agence
+        JLabel fraisAgence = new JLabel("frais agence : ");
+        SpinnerNumberModel fraisModel = new SpinnerNumberModel(0, 0, 999999999, 0.01);
+        JSpinner fraisAgenceField = new JSpinner(fraisModel);
+        this.add(fraisAgence);
+        this.add(fraisAgenceField);
+
+        // add email vendeur
+        JLabel emailVendeur = new JLabel("email vendeur : ");
+        JTextField emailVendeurField = new JTextField();
+        this.add(emailVendeur);
+        this.add(emailVendeurField);
+
+        // add titre
+        JLabel titre = new JLabel("titre : ");
+        JTextField titreField = new JTextField();
+        this.add(titre);
+        this.add(titreField);
 
         // add images
-        this.images = new JLabel("image(s) : ");
-        this.imagesField = new JButton("image(s)");
-        this.imagesField.addActionListener(e -> {
+        List<String> liensImage = new ArrayList<>();
+        JLabel images = new JLabel("image(s) : ");
+        JButton imagesField = new JButton("image(s)");
+        imagesField.addActionListener(e -> {
             try {
-                AnnoncePanel.getImages();
+                for(String lien: Image.getImages()) {
+                    liensImage.add(lien);
+                }
             } catch (IOException | SQLException ioException) {
                 ioException.printStackTrace();
             }
         });
-        this.add(this.images);
-        this.add(this.imagesField);
+        this.add(images);
+        this.add(imagesField);
+
+        // add id_agent
+        JLabel code_agent = new JLabel("code agent :");
+        JTextField code_agentField = new JTextField();
+        this.add(code_agent);
+        this.add(code_agentField);
 
         //boutton submit
         this.add(new JPanel());
-        this.submit = new JButton("submit");
-        this.add(this.submit);
+        JButton submit = new JButton("submit");
+        submit.addActionListener(e -> {
+            Client clientTemp = new Client();
+            try {
+                clientTemp = Client.findByEmail(emailVendeurField.getText());
+            } catch (SQLException | ClassNotFoundException throwables) {
+                throwables.printStackTrace();
+            }
+            try {
+                assert clientTemp != null;
+                if(!clientTemp.isVendeur()) {
+                    JOptionPane.showMessageDialog(new JFrame(), "le client n'est pas vendeur");
+                }
+            } catch (SQLException | ClassNotFoundException throwables) {
+                throwables.printStackTrace();
+            }
+            // enregistrement du bien
+            Bien temp = new Bien();
+            temp.setSuperficie(Float.valueOf(superficieField.getText()));
+            temp.setFrais_agence(Float.parseFloat(fraisAgenceField.getValue().toString()));
+            temp.setPrix_min(Float.parseFloat(prixMinField.getValue().toString()));
+            temp.setVerranda(verrandaField.isSelected());
+            temp.setTerrasse(terrasseField.isSelected());
+            temp.setLoggia(loggiaField.isSelected());
+            temp.setCeillier(ceillierField.isSelected());
+            temp.setJardin(jardinField.isSelected());
+            temp.setDescription(descriptionField.getText());
+            temp.setType(Objects.requireNonNull(typeField.getSelectedItem()).toString());
+            temp.setNb_pieces((Integer)nbPiecesField.getValue());
+            temp.setCave(caveField.isSelected());
+            temp.setGarage(garageField.isSelected());
+            try {
+                temp.setIdVendeur(Vendeur.findByIdClient(clientTemp.getId()).getId());
+            } catch (SQLException | ClassNotFoundException throwables) {
+                throwables.printStackTrace();
+            }
+            try {
+                temp.save();
+            } catch (SQLException | ClassNotFoundException throwables) {
+                throwables.printStackTrace();
+            }
+            Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+            try {
+                db.connect();
+            } catch (ClassNotFoundException | SQLException classNotFoundException) {
+                classNotFoundException.printStackTrace();
+            }
+            ResultSet recuperationId = null;
+            try {
+                recuperationId = db.select("SELECT * FROM bien ORDER BY id DESC LIMIT 1;");
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+            try {
+                assert recuperationId != null;
+                recuperationId.next();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+            Integer id = null;
+            try {
+                id = recuperationId.getInt("id");
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+            //enregistrement des images
+            for(String lien: liensImage) {
+                Image temp2 = new Image();
+                try {
+                    temp2.setInBinaries(new FileInputStream(lien));
+                } catch (FileNotFoundException fileNotFoundException) {
+                    fileNotFoundException.printStackTrace();
+                }
+                temp2.setId_bien(id);
+                try {
+                    temp2.save();
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+            //enregistrement de l'annonce
+            Annonce temp3 = new Annonce();
+            temp3.setTitre(titreField.getText());
+            temp3.setId_bien(id);
+            try {
+                temp3.setId_agent(Agent.findByCodeAgent(Integer.parseInt(code_agentField.getText())).getId());
+            } catch (SQLException | ClassNotFoundException throwables) {
+                throwables.printStackTrace();
+            }
+            try {
+                temp3.save();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            } catch (ClassNotFoundException classNotFoundException) {
+                classNotFoundException.printStackTrace();
+            }
 
+        });
+        this.add(submit);
         this.revalidate();
         this.repaint();
     }
@@ -311,14 +425,5 @@ public class AnnoncePanel extends JPanel {
         this.add(new JLabel(String.valueOf(agent.getCode_agent())));
         this.revalidate();
         this.repaint();
-    }
-
-    /**
-     * methode pour appeler la recuperation d'images
-     * @throws IOException
-     * @throws SQLException
-     */
-    public static void getImages() throws IOException, SQLException {
-        Image.getImages();
     }
 }
