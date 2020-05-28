@@ -244,4 +244,28 @@ public class Annonce {
         return retour;
     }
 
+    /**
+     * methode pour trouver une annonce en fonction de l'id du bien
+     * @param id
+     * @return l'instance de Annonce lier au bien que l'on veut
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public static Annonce findByIdBien(Integer id) throws SQLException, ClassNotFoundException {
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "SELECT * FROM annonce WHERE id_bien = ";
+        query += id;
+        ResultSet result = db.select(query);
+        result.next();
+        Annonce instance = new Annonce();
+        instance.setId(result.getInt("id"));
+        instance.setId_bien(result.getInt("id_bien"));
+        instance.setId_agent(result.getInt("id_agent"));
+        instance.setNb_favoris(result.getInt("nb_favoris"));
+        instance.setNb_visites(result.getInt("nb_visites"));
+        instance.setTitre(result.getString("titre"));
+        return instance;
+    }
+
 }

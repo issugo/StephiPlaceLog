@@ -21,10 +21,16 @@ import java.util.List;
 public class BienPanel extends JPanel {
     JButton choix1, choix2, choix3;
 
+    public static int RIEN = 0;
+    public static int TOUT_BIEN = 1;
+    public static int BIEN_SANS_ANNONCE = 2;
+    public static int FORM_BIEN = 3;
+
     /**
      * constructeur
      */
     public BienPanel() {
+        this.removeAll();
         this.choix1 = new JButton("voir tout les biens");
         this.choix1.addActionListener(e -> {
             try {
@@ -54,6 +60,8 @@ public class BienPanel extends JPanel {
         this.add(this.choix1);
         this.add(this.choix2);
         this.add(this.choix3);
+        this.revalidate();
+        this.repaint();
     }
 
     /**
@@ -68,7 +76,7 @@ public class BienPanel extends JPanel {
         this.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         for (Bien bien: allBiens) {
             JPanel temp = new JPanel();
-            temp.setLayout(new GridLayout(15,2));
+            temp.setLayout(new GridLayout(16,2));
             temp.add(new JLabel("id :"));
             temp.add(new JLabel(String.valueOf(bien.getId())));
             temp.add(new JLabel("superficie :"));
@@ -127,6 +135,23 @@ public class BienPanel extends JPanel {
             temp.add(new JLabel(String.valueOf(bien.getFrais_agence())));
             temp.add(new JLabel("email vendeur :"));
             temp.add(new JLabel(Vendeur.find(bien.getIdVendeur()).findClient().getEmail()));
+            temp.add(new JPanel());
+            JButton suppression = new JButton("supprimer");
+            suppression.addActionListener(e -> {
+                try {
+                    if (bien.hasAnnonce()) {
+                        Annonce.findByIdBien(bien.getId()).delete();
+                    }
+                    for (Image image: bien.getImages()) {
+                        image.delete();
+                    }
+                    bien.delete();
+                    refresh(BienPanel.TOUT_BIEN);
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+            });
+            temp.add(suppression);
             temp.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             this.add(temp);
         }
@@ -226,7 +251,7 @@ public class BienPanel extends JPanel {
     public void showFormAnnonce(Integer id) {
         this.removeAll();
         System.out.println(id);
-        this.setLayout(new GridLayout(2, 2));
+        this.setLayout(new GridLayout(3, 2));
         this.add(new JLabel("titre :"));
         JTextField temp2 = new JTextField();
         this.add(temp2);
@@ -234,48 +259,45 @@ public class BienPanel extends JPanel {
         JTextField temp3 = new JTextField();
         this.add(temp3);
         JButton temp = new JButton("save");
-        temp.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Integer id_agent = null;
-                ResultSet result = null;
-                Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        temp.addActionListener(e -> {
+            Integer id_agent = null;
+            ResultSet result = null;
+            Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+            try {
+                db.connect();
+            } catch (ClassNotFoundException classNotFoundException) {
+                classNotFoundException.printStackTrace();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+            //recuperation code agent
+            String query1 = "SELECT * FROM agent WHERE code_agent = " + Integer.parseInt(temp3.getText());
+            try {
+                result = db.select(query1);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+            while(true) {
                 try {
-                    db.connect();
-                } catch (ClassNotFoundException classNotFoundException) {
-                    classNotFoundException.printStackTrace();
+                    if (!result.next()) break;
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
-                //recuperation code agent
-                String query1 = "SELECT * FROM agent WHERE code_agent = " + Integer.parseInt(temp3.getText());
                 try {
-                    result = db.select(query1);
+                    id_agent = result.getInt("id");
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
-                while(true) {
-                    try {
-                        if (!result.next()) break;
-                    } catch (SQLException throwables) {
-                        throwables.printStackTrace();
-                    }
-                    try {
-                        id_agent = result.getInt("id");
-                    } catch (SQLException throwables) {
-                        throwables.printStackTrace();
-                    }
-                }
-                //sauvegarde annonce
-                Annonce annonce = new Annonce();
-                annonce.setTitre(temp2.getText());
-                annonce.setId_agent(id_agent);
-                annonce.setId_bien(id);
-                try {
-                    annonce.save();
-                } catch (SQLException | ClassNotFoundException throwables) {
-                    throwables.printStackTrace();
-                }
+            }
+            //sauvegarde annonce
+            Annonce annonce = new Annonce();
+            annonce.setTitre(temp2.getText());
+            annonce.setId_agent(id_agent);
+            annonce.setId_bien(id);
+            try {
+                annonce.save();
+            } catch (SQLException | ClassNotFoundException throwables) {
+                throwables.printStackTrace();
             }
         });
         this.add(temp);
@@ -385,18 +407,13 @@ public class BienPanel extends JPanel {
         List<String> liensImage = new ArrayList<>();
         JLabel images = new JLabel("image(s) : ");
         JButton imagesField = new JButton("image(s)");
-        imagesField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    for(String lien: Image.getImages()) {
-                        liensImage.add(lien);
-                    }
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
+        imagesField.addActionListener(e -> {
+            try {
+                for(String lien: Image.getImages()) {
+                    liensImage.add(lien);
                 }
+            } catch (IOException | SQLException ioException) {
+                ioException.printStackTrace();
             }
         });
         this.add(images);
@@ -405,93 +422,113 @@ public class BienPanel extends JPanel {
         //boutton submit
         this.add(new JPanel());
         JButton submit = new JButton("submit");
-        submit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Client clientTemp = new Client();
-                try {
-                    clientTemp = Client.findByEmail(emailVendeurField.getText());
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                } catch (ClassNotFoundException classNotFoundException) {
-                    classNotFoundException.printStackTrace();
-                }
-                try {
-                    if(!clientTemp.isVendeur()) {
-                        JOptionPane.showMessageDialog(new JFrame(), "le client n'est pas vendeur");
-                    }
-                } catch (SQLException | ClassNotFoundException throwables) {
-                    throwables.printStackTrace();
-                }
-                if(clientTemp == null) {
-                    return;
-                }
-                Bien temp = new Bien();
-                temp.setSuperficie(Float.valueOf(superficieField.getText()));
-                temp.setFrais_agence(Float.valueOf(fraisAgenceField.getValue().toString()));
-                temp.setPrix_min(Float.valueOf(prixMinField.getValue().toString()));
-                temp.setVerranda(verrandaField.isSelected());
-                temp.setTerrasse(terrasseField.isSelected());
-                temp.setLoggia(loggiaField.isSelected());
-                temp.setCeillier(ceillierField.isSelected());
-                temp.setJardin(jardinField.isSelected());
-                temp.setDescription(descriptionField.getText());
-                temp.setType(typeField.getSelectedItem().toString());
-                temp.setNb_pieces((Integer)nbPiecesField.getValue());
-                temp.setCave(caveField.isSelected());
-                temp.setGarage(garageField.isSelected());
-                try {
-                    temp.setIdVendeur(Vendeur.findByIdClient(clientTemp.getId()).getId());
-                } catch (SQLException | ClassNotFoundException throwables) {
-                    throwables.printStackTrace();
-                }
-                try {
-                    temp.save();
-                } catch (SQLException | ClassNotFoundException throwables) {
-                    throwables.printStackTrace();
-                }
-                Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
-                try {
-                    db.connect();
-                } catch (ClassNotFoundException | SQLException classNotFoundException) {
-                    classNotFoundException.printStackTrace();
-                }
-                ResultSet recuperationId = null;
-                try {
-                    recuperationId = db.select("SELECT * FROM bien ORDER BY id DESC LIMIT 1;");
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
-                try {
-                    recuperationId.next();
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
-                Integer id = null;
-                try {
-                     id = recuperationId.getInt("id");
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
-                for(String lien: liensImage) {
-                    Image temp2 = new Image();
-                    try {
-                        temp2.setInBinaries(new FileInputStream(lien));
-                    } catch (FileNotFoundException fileNotFoundException) {
-                        fileNotFoundException.printStackTrace();
-                    }
-                    temp2.setId_bien(id);
-                    try {
-                        temp2.save();
-                    } catch (SQLException | ClassNotFoundException throwables) {
-                        throwables.printStackTrace();
-                    }
-                }
-
+        submit.addActionListener(e -> {
+            Client clientTemp = new Client();
+            try {
+                clientTemp = Client.findByEmail(emailVendeurField.getText());
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            } catch (ClassNotFoundException classNotFoundException) {
+                classNotFoundException.printStackTrace();
             }
+            try {
+                if(!clientTemp.isVendeur()) {
+                    JOptionPane.showMessageDialog(new JFrame(), "le client n'est pas vendeur");
+                }
+            } catch (SQLException | ClassNotFoundException throwables) {
+                throwables.printStackTrace();
+            }
+            if(clientTemp == null) {
+                return;
+            }
+            Bien temp = new Bien();
+            temp.setSuperficie(Float.valueOf(superficieField.getText()));
+            temp.setFrais_agence(Float.valueOf(fraisAgenceField.getValue().toString()));
+            temp.setPrix_min(Float.valueOf(prixMinField.getValue().toString()));
+            temp.setVerranda(verrandaField.isSelected());
+            temp.setTerrasse(terrasseField.isSelected());
+            temp.setLoggia(loggiaField.isSelected());
+            temp.setCeillier(ceillierField.isSelected());
+            temp.setJardin(jardinField.isSelected());
+            temp.setDescription(descriptionField.getText());
+            temp.setType(typeField.getSelectedItem().toString());
+            temp.setNb_pieces((Integer)nbPiecesField.getValue());
+            temp.setCave(caveField.isSelected());
+            temp.setGarage(garageField.isSelected());
+            try {
+                temp.setIdVendeur(Vendeur.findByIdClient(clientTemp.getId()).getId());
+            } catch (SQLException | ClassNotFoundException throwables) {
+                throwables.printStackTrace();
+            }
+            try {
+                temp.save();
+            } catch (SQLException | ClassNotFoundException throwables) {
+                throwables.printStackTrace();
+            }
+            Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+            try {
+                db.connect();
+            } catch (ClassNotFoundException | SQLException classNotFoundException) {
+                classNotFoundException.printStackTrace();
+            }
+            ResultSet recuperationId = null;
+            try {
+                recuperationId = db.select("SELECT * FROM bien ORDER BY id DESC LIMIT 1;");
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+            try {
+                recuperationId.next();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+            Integer id = null;
+            try {
+                 id = recuperationId.getInt("id");
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+            for(String lien: liensImage) {
+                Image temp2 = new Image();
+                try {
+                    temp2.setInBinaries(new FileInputStream(lien));
+                } catch (FileNotFoundException fileNotFoundException) {
+                    fileNotFoundException.printStackTrace();
+                }
+                temp2.setId_bien(id);
+                try {
+                    temp2.save();
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+            try {
+                refresh(BienPanel.TOUT_BIEN);
+            } catch (SQLException | ClassNotFoundException throwables) {
+                throwables.printStackTrace();
+            }
+
         });
         this.add(submit);
         this.revalidate();
         this.repaint();
+    }
+
+    /**
+     * methode de rafraichissement du panel
+     * @param etat
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public void refresh(Integer etat) throws SQLException, ClassNotFoundException {
+        if (etat == 0) {
+            //blabla
+        } else if (etat == 1) {
+            this.showAllBiens();
+        } else if (etat == 2) {
+            this.showAllBiensWithoutAnnonce();
+        } else if (etat == 3) {
+            this.showCreateBienForm();
+        }
     }
 }

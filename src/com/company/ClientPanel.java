@@ -3,13 +3,12 @@ package com.company;
 import javax.swing.*;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 import com.backend.Client;
 import com.backend.Image;
@@ -158,18 +157,14 @@ public class ClientPanel extends JPanel {
             temp.setPassword(this.passwordField.getText());
             try {
                 temp.save();
-            } catch (SQLException throwables) {
+            } catch (SQLException | ClassNotFoundException throwables) {
                 throwables.printStackTrace();
-            } catch (ClassNotFoundException classNotFoundException) {
-                classNotFoundException.printStackTrace();
             }
             Integer idTemp = null;
             try {
-                idTemp = Client.findByEmail(this.emailField.getText()).getId();
-            } catch (SQLException throwables) {
+                idTemp = Objects.requireNonNull(Client.findByEmail(this.emailField.getText())).getId();
+            } catch (SQLException | ClassNotFoundException throwables) {
                 throwables.printStackTrace();
-            } catch (ClassNotFoundException classNotFoundException) {
-                classNotFoundException.printStackTrace();
             }
             Vendeur temp2 = new Vendeur();
             temp2.setIdClient(idTemp);
@@ -180,10 +175,8 @@ public class ClientPanel extends JPanel {
             }
             try {
                 temp2.save();
-            } catch (SQLException throwables) {
+            } catch (SQLException | ClassNotFoundException throwables) {
                 throwables.printStackTrace();
-            } catch (ClassNotFoundException classNotFoundException) {
-                classNotFoundException.printStackTrace();
             }
         });
         this.add(new JPanel());

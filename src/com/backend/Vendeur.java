@@ -100,7 +100,7 @@ public class Vendeur {
         PreparedStatement pstmt = con.prepareStatement("INSERT INTO vendeur(`id_Client`, `carte_identite`) VALUES(?, ?)");
         pstmt.setBlob(2, this.getCINTemp());
         pstmt.setInt(1, this.getIdClient());
-        Integer test  = pstmt.executeUpdate();
+        int test  = pstmt.executeUpdate();
         if (test > 1) {
             retour = true;
         }

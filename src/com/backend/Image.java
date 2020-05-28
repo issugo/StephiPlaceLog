@@ -149,6 +149,25 @@ public class Image {
     }
 
     /**
+     * methode pour supprimer les images de la base
+     * @return un boolean de verification
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public boolean delete() throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "DELETE FROM image WHERE id = " + this.getId() + ";";
+        Integer test = db.insertOrUpdate(query);
+        if (test > 1) {
+            retour = true;
+        }
+        db.close();
+        return retour;
+    }
+
+    /**
      * methode pour récupérer plusieurs liens d'images à upload
      * @return une List de lien
      * @throws IOException

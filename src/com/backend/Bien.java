@@ -504,4 +504,27 @@ public class Bien {
         }
         return retour;
     }
+
+    /**
+     * methode pour récupérer les images lier à un bien
+     * @return la List des images
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public List<Image> getImages() throws SQLException, ClassNotFoundException {
+        List<Image> retour = new ArrayList<>();
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "SELECT * FROM image WHERE id_bien = ";
+        query += this.getId();
+        ResultSet result = db.select(query);
+        while (result.next()) {
+            Image instance = new Image();
+            instance.setId(result.getInt("id"));
+            instance.setId_bien(result.getInt("id_bien"));
+            instance.setBinaries(result.getBlob("image"));
+            retour.add(instance);
+        }
+        return retour;
+    }
 }
