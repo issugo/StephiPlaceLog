@@ -74,7 +74,7 @@ public class ConnexionPanel extends JFrame {
             }
             if (rowNumber!=0) {
                 try {
-                    new Application();
+                    new Application(resultat.getInt("id"));
                     this.dispose();
                 } catch (Exception exception) {
                     exception.printStackTrace();

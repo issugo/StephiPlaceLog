@@ -14,6 +14,7 @@ public class Application extends JFrame{
     Dimension dimension = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
     int height = (int)dimension.getHeight();
     int width = (int)dimension.getWidth();
+    Integer idAgentCo;
 
     //toolbar
     JButton close, annoncesTrigger, clientsTrigger, biensTrigger;
@@ -29,13 +30,15 @@ public class Application extends JFrame{
      * constructeur
      * @throws Exception
      */
-    public Application() throws Exception {
+    public Application(Integer idAgent) throws Exception {
         //preparation des components
         this.save = this;
+        this.idAgentCo = idAgent;
         this.mainPanel = new JPanel();
-        this.annoncePanel = new AnnoncePanel();
+        this.annoncePanel = new AnnoncePanel(this.idAgentCo);
         this.clientsPanel = new ClientPanel();
         this.bienPanel = new BienPanel();
+
 
         //set css default
         UIManager.setLookAndFeel(new NimbusLookAndFeel());
@@ -91,7 +94,7 @@ public class Application extends JFrame{
      */
     public void afficherClientPanel() {
         try {
-            this.annoncePanel = new AnnoncePanel();
+            this.annoncePanel = new AnnoncePanel(this.idAgentCo);
             this.clientsPanel = new ClientPanel();
             this.bienPanel = new BienPanel();
         } catch(Exception e) {
@@ -108,7 +111,7 @@ public class Application extends JFrame{
      */
     public void afficherAnnoncePanel() {
         try {
-            this.annoncePanel = new AnnoncePanel();
+            this.annoncePanel = new AnnoncePanel(this.idAgentCo);
             this.clientsPanel = new ClientPanel();
             this.bienPanel = new BienPanel();
         } catch(Exception e) {
@@ -125,7 +128,7 @@ public class Application extends JFrame{
      */
     public void afficherBienPanel() {
         try {
-            this.annoncePanel = new AnnoncePanel();
+            this.annoncePanel = new AnnoncePanel(this.idAgentCo);
             this.clientsPanel = new ClientPanel();
             this.bienPanel = new BienPanel();
         } catch(Exception e) {

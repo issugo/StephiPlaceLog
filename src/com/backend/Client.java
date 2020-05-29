@@ -3,11 +3,17 @@ package com.backend;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Classe Client représentant les Clients qu'ils soient vendeur ou acheteur
@@ -124,8 +130,15 @@ public class Client {
      * @param password
      * @return le password du client
      */
-    public String setPassword(String password) {
-        this.password = password;
+    public String setPassword(String password) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
+        BigInteger number = new BigInteger(1, hash);
+        StringBuilder hexString = new StringBuilder(number.toString(16));
+        while (hexString.length() < 32) {
+            hexString.insert(0, '0');
+        }
+        this.password = hexString.toString();
         return password;
     }
 
@@ -174,6 +187,25 @@ public class Client {
         boolean retour = false;
         Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
+        String query = "UPDATE client SET " + champ + " = '" + newValue + "' WHERE id = " + this.getId() + ";";
+        Integer test = db.insertOrUpdate(query);
+        if (test > 1) {
+            retour = true;
+        }
+        db.close();
+        return retour;
+    }
+
+    /**
+     * methode pour modifier l'instance en base
+     * @return un boolean de verification
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public boolean update(String champ, Integer newValue) throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
         String query = "UPDATE client SET " + champ + " = " + newValue + " WHERE id = " + this.getId() + ";";
         Integer test = db.insertOrUpdate(query);
         if (test > 1) {
@@ -209,7 +241,7 @@ public class Client {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public static @NotNull Client find(Integer id) throws SQLException, ClassNotFoundException {
+    public static @NotNull Client find(Integer id) throws SQLException, ClassNotFoundException, NoSuchAlgorithmException {
         Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
         String query = "SELECT * FROM client WHERE id = ";
@@ -233,7 +265,7 @@ public class Client {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public static Client findByEmail(String email) throws SQLException, ClassNotFoundException {
+    public static Client findByEmail(String email) throws SQLException, ClassNotFoundException, NoSuchAlgorithmException {
         Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
         String query = "SELECT * FROM client WHERE email = '" + email + "';";
@@ -262,7 +294,7 @@ public class Client {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public static @NotNull List findAll() throws SQLException, ClassNotFoundException {
+    public static @NotNull List findAll() throws SQLException, ClassNotFoundException, NoSuchAlgorithmException {
         List<Client> retour = new ArrayList<>();
         Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
@@ -299,5 +331,16 @@ public class Client {
             retour = true;
         }
         return retour;
+    }
+
+    /**
+     * methode de verification d'email selon une regex
+     * @param email
+     * @return un boolean de validation
+     */
+    public static boolean isValidEmail(String email) {
+        Pattern p = Pattern.compile("(?:[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])");
+        Matcher m = p.matcher(email);
+        return m.matches();
     }
 }

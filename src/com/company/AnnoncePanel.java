@@ -4,9 +4,12 @@ import com.backend.*;
 import com.backend.Image;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,12 +22,15 @@ import javax.swing.*;
  */
 public class AnnoncePanel extends JPanel {
 
-    JButton choix1, choix2;
+    JButton choix1, choix2, choix3;
+    Integer idAgentCo;
 
     /**
      * constructeur
      */
-    public AnnoncePanel() {
+    public AnnoncePanel(Integer idAgent) {
+
+        this.idAgentCo = idAgent;
 
         this.choix1 = new JButton("voir les annonces");
         this.choix1.addActionListener(e -> {
@@ -42,10 +48,19 @@ public class AnnoncePanel extends JPanel {
                 exception.printStackTrace();
             }
         });
+        this.choix3 = new JButton("annonce de l'agent");
+        this.choix3.addActionListener(e -> {
+            try {
+                showAgentAnnonces(this.idAgentCo);
+            } catch (SQLException | ClassNotFoundException throwables) {
+                throwables.printStackTrace();
+            }
+        });
 
         this.setLayout(new GridLayout(1, 2));
         this.add(this.choix1);
         this.add(this.choix2);
+        this.add(this.choix3);
 
     }
 
@@ -82,7 +97,7 @@ public class AnnoncePanel extends JPanel {
             temp2.addActionListener(e -> {
                 try {
                     showBien(annonce.getId_bien());
-                } catch (SQLException | ClassNotFoundException throwables) {
+                } catch (SQLException | ClassNotFoundException | NoSuchAlgorithmException throwables) {
                     throwables.printStackTrace();
                 }
             });
@@ -97,6 +112,72 @@ public class AnnoncePanel extends JPanel {
                 }
             });
             temp.add(temp2);
+            temp.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            this.add(temp);
+        }
+        this.revalidate();
+        this.repaint();
+    }
+
+    /**
+     * methode pour récupérer toutes les annonces liés à un agent
+     * @param id id de l'agent
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public void showAgentAnnonces(Integer id) throws SQLException, ClassNotFoundException {
+        // suppression de tout les components actuellement présents
+        this.removeAll();
+
+        // recupere toute les annonces
+        List<Annonce> allAnnonces = Annonce.findByIdAgent(id);
+
+        // set l'affichage
+        this.setLayout(new GridLayout(allAnnonces.size()/2,2));
+        this.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+
+        // affichage annonce par annonce
+        for (Annonce annonce: allAnnonces) {
+            JPanel temp = new JPanel();
+            temp.setLayout(new GridLayout(7, 2));
+            temp.add(new JLabel("id :"));
+            temp.add(new JLabel(String.valueOf(annonce.getId())));
+            temp.add(new JLabel("titre :"));
+            temp.add(new JLabel(annonce.getTitre()));
+            temp.add(new JLabel("nb_favoris :"));
+            temp.add(new JLabel(String.valueOf(annonce.getNb_favoris())));
+            temp.add(new JLabel("nb_visites :"));
+            temp.add(new JLabel(String.valueOf(annonce.getNb_visites())));
+            temp.add(new JLabel("id_bien :"));
+            JButton temp2 = new JButton(String.valueOf(annonce.getId_bien()));
+            temp2.addActionListener(e -> {
+                try {
+                    showBien(annonce.getId_bien());
+                } catch (SQLException | ClassNotFoundException | NoSuchAlgorithmException throwables) {
+                    throwables.printStackTrace();
+                }
+            });
+            temp.add(temp2);
+            temp.add(new JLabel("agent :"));
+            temp2 = new JButton(String.valueOf(Agent.find(annonce.getId_agent()).getCode_agent()));
+            temp2.addActionListener(e -> {
+                try {
+                    showAgent(annonce.getId_agent());
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+            });
+            temp.add(temp2);
+            temp.add(new JPanel());
+            JButton suppression = new JButton("supprimer");
+            suppression.addActionListener(e -> {
+                try {
+                    annonce.delete();
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+            });
+            temp.add(suppression);
             temp.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             this.add(temp);
         }
@@ -237,7 +318,7 @@ public class AnnoncePanel extends JPanel {
             Client clientTemp = new Client();
             try {
                 clientTemp = Client.findByEmail(emailVendeurField.getText());
-            } catch (SQLException | ClassNotFoundException throwables) {
+            } catch (SQLException | ClassNotFoundException | NoSuchAlgorithmException throwables) {
                 throwables.printStackTrace();
             }
             try {
@@ -339,7 +420,7 @@ public class AnnoncePanel extends JPanel {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public void showBien(Integer id) throws SQLException, ClassNotFoundException {
+    public void showBien(Integer id) throws SQLException, ClassNotFoundException, NoSuchAlgorithmException {
         this.removeAll();
         Bien bien = Bien.find(id);
         this.setLayout(new GridLayout(15,2));

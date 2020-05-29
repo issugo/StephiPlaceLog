@@ -6,6 +6,7 @@ import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ public class ClientPanel extends JPanel {
         this.choix1.addActionListener(e -> {
             try {
                 showAllClients();
-            } catch (SQLException | ClassNotFoundException throwables) {
+            } catch (SQLException | ClassNotFoundException | NoSuchAlgorithmException throwables) {
                 throwables.printStackTrace();
             }
         });
@@ -57,7 +58,7 @@ public class ClientPanel extends JPanel {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public void showAllClients() throws SQLException, ClassNotFoundException {
+    public void showAllClients() throws SQLException, ClassNotFoundException, NoSuchAlgorithmException {
         this.removeAll();
         List<Client> allClient = Client.findAll();
         this.setLayout(new GridLayout(allClient.size()/2,2));
@@ -184,34 +185,48 @@ public class ClientPanel extends JPanel {
         //boutton de submit
         this.submit = new JButton("submit");
         this.submit.addActionListener(e -> {
-            Client temp = new Client();
-            temp.setNom(this.nomField.getText());
-            temp.setPrenom(this.prenomField.getText());
-            temp.setEmail(this.emailField.getText());
-            temp.setTelephone(this.telField.getText());
-            temp.setPassword(this.passwordField.getText());
-            try {
-                temp.save();
-            } catch (SQLException | ClassNotFoundException throwables) {
-                throwables.printStackTrace();
-            }
-            Integer idTemp = null;
-            try {
-                idTemp = Objects.requireNonNull(Client.findByEmail(this.emailField.getText())).getId();
-            } catch (SQLException | ClassNotFoundException throwables) {
-                throwables.printStackTrace();
-            }
-            Vendeur temp2 = new Vendeur();
-            temp2.setIdClient(idTemp);
-            try {
-                temp2.setCINTemp(new FileInputStream(lienImage[0]));
-            } catch (FileNotFoundException fileNotFoundException) {
-                fileNotFoundException.printStackTrace();
-            }
-            try {
-                temp2.save();
-            } catch (SQLException | ClassNotFoundException throwables) {
-                throwables.printStackTrace();
+
+            if(!Client.isValidEmail(this.emailField.getText())) {
+                JOptionPane.showMessageDialog(new JFrame(), "L'email n'est pas valide");
+            } else {
+                Client temp = new Client();
+                temp.setNom(this.nomField.getText());
+                temp.setPrenom(this.prenomField.getText());
+                temp.setEmail(this.emailField.getText());
+                temp.setTelephone(this.telField.getText());
+                try {
+                    temp.setPassword(this.passwordField.getText());
+                } catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+                    noSuchAlgorithmException.printStackTrace();
+                }
+                try {
+                    temp.save();
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+                Integer idTemp = null;
+                try {
+                    idTemp = Objects.requireNonNull(Client.findByEmail(this.emailField.getText())).getId();
+                } catch (SQLException | ClassNotFoundException | NoSuchAlgorithmException throwables) {
+                    throwables.printStackTrace();
+                }
+                Vendeur temp2 = new Vendeur();
+                temp2.setIdClient(idTemp);
+                try {
+                    temp2.setCINTemp(new FileInputStream(lienImage[0]));
+                } catch (FileNotFoundException fileNotFoundException) {
+                    fileNotFoundException.printStackTrace();
+                }
+                try {
+                    temp2.save();
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+                try {
+                    refresh(1);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
             }
         });
         this.add(new JPanel());

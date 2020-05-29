@@ -344,7 +344,7 @@ public class Bien {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public boolean updateString(String champ, String newValue) throws SQLException, ClassNotFoundException {
+    public boolean update(String champ, String newValue) throws SQLException, ClassNotFoundException {
         boolean retour = false;
         Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
@@ -365,7 +365,7 @@ public class Bien {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public boolean updateInt(String champ, Integer newValue) throws SQLException, ClassNotFoundException {
+    public boolean update(String champ, Integer newValue) throws SQLException, ClassNotFoundException {
         boolean retour = false;
         Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();

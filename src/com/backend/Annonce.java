@@ -216,6 +216,27 @@ public class Annonce {
         boolean retour = false;
         Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
+        String query = "UPDATE annonce SET " + champ + " = '" + newValue + "' WHERE id = " + this.getId() + ";";
+        Integer test = db.insertOrUpdate(query);
+        if (test > 1) {
+            retour = true;
+        }
+        db.close();
+        return retour;
+    }
+
+    /**
+     * methode pour modifier un champ d'une instance de Annonce en bdd
+     * @param champ
+     * @param newValue
+     * @return un boolean de verification
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public boolean update(String champ, Integer newValue) throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
         String query = "UPDATE annonce SET " + champ + " = " + newValue + " WHERE id = " + this.getId() + ";";
         Integer test = db.insertOrUpdate(query);
         if (test > 1) {
@@ -266,6 +287,33 @@ public class Annonce {
         instance.setNb_visites(result.getInt("nb_visites"));
         instance.setTitre(result.getString("titre"));
         return instance;
+    }
+
+    /**
+     * methode pour retourner une List de toutes les annonces en fonction de l'id de l'agent
+     * @param id
+     * @return une List de toutes les annonces en fonction de l'id de l'agent
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public static List<Annonce> findByIdAgent(Integer id) throws SQLException, ClassNotFoundException {
+        List<Annonce> retour = new ArrayList<>();
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "SELECT * FROM annonce WHERE id_agent = ";
+        query += id;
+        ResultSet result = db.select(query);
+        while (result.next()) {
+            Annonce instance = new Annonce();
+            instance.setId(result.getInt("id"));
+            instance.setId_bien(result.getInt("id_bien"));
+            instance.setId_agent(result.getInt("id_agent"));
+            instance.setNb_favoris(result.getInt("nb_favoris"));
+            instance.setNb_visites(result.getInt("nb_visites"));
+            instance.setTitre(result.getString("titre"));
+            retour.add(instance);
+        }
+        return retour;
     }
 
 }

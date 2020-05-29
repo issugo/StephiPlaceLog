@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class BienPanel extends JPanel {
         this.choix1.addActionListener(e -> {
             try {
                 showAllBiens();
-            } catch (SQLException | ClassNotFoundException throwables) {
+            } catch (SQLException | ClassNotFoundException | NoSuchAlgorithmException throwables) {
                 throwables.printStackTrace();
             }
         });
@@ -69,7 +70,7 @@ public class BienPanel extends JPanel {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public void showAllBiens() throws SQLException, ClassNotFoundException {
+    public void showAllBiens() throws SQLException, ClassNotFoundException, NoSuchAlgorithmException {
         this.removeAll();
         List<Bien> allBiens = Bien.findAll();
         this.setLayout(new GridLayout(allBiens.size()/2,2));
@@ -147,7 +148,7 @@ public class BienPanel extends JPanel {
                     }
                     bien.delete();
                     refresh(BienPanel.TOUT_BIEN);
-                } catch (SQLException | ClassNotFoundException throwables) {
+                } catch (SQLException | ClassNotFoundException | NoSuchAlgorithmException throwables) {
                     throwables.printStackTrace();
                 }
             });
@@ -430,6 +431,8 @@ public class BienPanel extends JPanel {
                 throwables.printStackTrace();
             } catch (ClassNotFoundException classNotFoundException) {
                 classNotFoundException.printStackTrace();
+            } catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+                noSuchAlgorithmException.printStackTrace();
             }
             try {
                 if(!clientTemp.isVendeur()) {
@@ -504,7 +507,7 @@ public class BienPanel extends JPanel {
             }
             try {
                 refresh(BienPanel.TOUT_BIEN);
-            } catch (SQLException | ClassNotFoundException throwables) {
+            } catch (SQLException | ClassNotFoundException | NoSuchAlgorithmException throwables) {
                 throwables.printStackTrace();
             }
 
@@ -520,7 +523,7 @@ public class BienPanel extends JPanel {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public void refresh(Integer etat) throws SQLException, ClassNotFoundException {
+    public void refresh(Integer etat) throws SQLException, ClassNotFoundException, NoSuchAlgorithmException {
         if (etat == 0) {
             //blabla
         } else if (etat == 1) {
