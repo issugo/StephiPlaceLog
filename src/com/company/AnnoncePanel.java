@@ -105,7 +105,7 @@ public class AnnoncePanel extends JPanel {
     }
 
     /**
-     *
+     * methode pour montrer le formulaire de creation d'annonce
      */
     public void showCreateAnnonceForm() {
         this.removeAll();

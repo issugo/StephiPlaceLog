@@ -2,6 +2,8 @@ package com.backend;
 
 import java.io.InputStream;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Classe Vendeur pour les clients autorisés
@@ -158,5 +160,60 @@ public class Vendeur {
      */
     public Client findClient() throws SQLException, ClassNotFoundException {
         return Client.find(this.getIdClient());
+    }
+
+    /**
+     * methode pour récupérer les biens associé à un vendeur
+     * @return une List de Bien
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public List<Bien> getBiens() throws SQLException, ClassNotFoundException {
+        List<Bien> retour = new ArrayList<>();
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "SELECT * FROM bien WHERE id_vendeur = ";
+        query += this.getId();
+        ResultSet result = db.select(query);
+        while (result.next()) {
+            Bien instance = new Bien();
+            instance.setId(result.getInt("id"));
+            instance.setSuperficie(result.getFloat("superficie"));
+            instance.setNb_pieces(result.getInt("nb_pieces"));
+            instance.setType(result.getString("type"));
+            instance.setDescription(result.getString("description"));
+            instance.setJardin(result.getBoolean("jardin"));
+            instance.setCave(result.getBoolean("cave"));
+            instance.setCeillier(result.getBoolean("ceillier"));
+            instance.setLoggia(result.getBoolean("loggia"));
+            instance.setTerrasse(result.getBoolean("terrasse"));
+            instance.setGarage(result.getBoolean("garage"));
+            instance.setVerranda(result.getBoolean("verranda"));
+            instance.setPrix_min(result.getFloat("prix_min"));
+            instance.setFrais_agence(result.getFloat("frais_agence"));
+            instance.setIdVendeur(result.getInt("id_vendeur"));
+            retour.add(instance);
+        }
+        db.close();
+        return retour;
+    }
+
+    /**
+     * methode pour detruire une instance en base
+     * @return un boolean de verification
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public boolean delete() throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "DELETE FROM vendeur WHERE id = " + this.getId() + ";";
+        Integer test = db.insertOrUpdate(query);
+        if (test > 1) {
+            retour = true;
+        }
+        db.close();
+        return retour;
     }
 }

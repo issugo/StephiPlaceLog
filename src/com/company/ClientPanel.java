@@ -7,12 +7,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.backend.Client;
+import com.backend.*;
 import com.backend.Image;
-import com.backend.Vendeur;
 
 /**
  * Classe du panel des clients
@@ -64,7 +64,7 @@ public class ClientPanel extends JPanel {
         this.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         for (Client client: allClient) {
             JPanel temp = new JPanel();
-            temp.setLayout(new GridLayout(6, 2));
+            temp.setLayout(new GridLayout(7, 2));
             temp.add(new JLabel("id :"));
             temp.add(new JLabel(String.valueOf(client.getId())));
             temp.add(new JLabel("nom :"));
@@ -81,6 +81,41 @@ public class ClientPanel extends JPanel {
             } else {
                 temp.add(new JLabel("non"));
             }
+            temp.add(new JPanel());
+            JButton supprimer = new JButton("supprimer");
+            supprimer.addActionListener(e -> {
+                try {
+                    if (client.isVendeur()) {
+                        List<Bien> biens = Vendeur.findByIdClient(client.getId()).getBiens();
+                        List<Annonce> annonces = new ArrayList<>();
+                        for (Bien bien: biens) {
+                            if (bien.hasAnnonce()) {
+                                annonces.add(Annonce.findByIdBien(bien.getId()));
+                            }
+                        }
+                        for (Annonce annonce: annonces) {
+                            annonce.delete();
+                        }
+                        for (Bien bien: biens) {
+                            bien.delete();
+                        }
+                        Vendeur.findByIdClient(client.getId()).delete();
+                    }
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+                try {
+                    client.delete();
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+                try {
+                    refresh(1);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            });
+            temp.add(supprimer);
             temp.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             this.add(temp);
         }
@@ -185,5 +220,21 @@ public class ClientPanel extends JPanel {
         this.revalidate();
         this.repaint();
 
+    }
+
+    /**
+     * methode de rafraichissement du panel
+     * @param etat
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public void refresh(Integer etat) throws Exception {
+        if (etat == 0) {
+            //blabla
+        } else if (etat == 1) {
+            this.showAllClients();
+        } else if (etat == 2) {
+            this.showCreateVendeurForm();
+        }
     }
 }
