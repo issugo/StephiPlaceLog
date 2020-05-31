@@ -9,6 +9,7 @@ public class ConnexionPanel extends JFrame {
     JTextField codeAgentField;
     JButton submit;
 
+
     public ConnexionPanel() {
         // setup composant
         this.codeAgent = new JLabel("code agent :");
@@ -42,6 +43,7 @@ public class ConnexionPanel extends JFrame {
             try {
                 con = DriverManager.getConnection(url, "root", "");
             } catch (SQLException throwables) {
+                JOptionPane.showMessageDialog(new JFrame(), "Erreur lors de la connection à la BDD");
                 throwables.printStackTrace();
             }
             try {

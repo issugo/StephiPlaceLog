@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -40,7 +41,7 @@ public class AnnoncePanel extends JPanel {
                 throwables.printStackTrace();
             }
         });
-        this.choix2 = new JButton("créer annonce");
+        this.choix2 = new JButton("cr\u00e9er annonce");
         this.choix2.addActionListener(e -> {
             try {
                 showCreateAnnonceForm();
@@ -83,7 +84,7 @@ public class AnnoncePanel extends JPanel {
         // affichage annonce par annonce
         for (Annonce annonce: allAnnonces) {
             JPanel temp = new JPanel();
-            temp.setLayout(new GridLayout(6, 2));
+            temp.setLayout(new GridLayout(8, 2));
             temp.add(new JLabel("id :"));
             temp.add(new JLabel(String.valueOf(annonce.getId())));
             temp.add(new JLabel("titre :"));
@@ -112,6 +113,18 @@ public class AnnoncePanel extends JPanel {
                 }
             });
             temp.add(temp2);
+            temp.add(new JLabel("vendu :"));
+            if (annonce.getVendu()) {
+                temp.add(new JLabel("oui"));
+            } else {
+                temp.add(new JLabel("non"));
+            }
+            temp.add(new JLabel("date vente :"));
+            if(annonce.getSales_at() == null) {
+                temp.add(new JLabel("----"));
+            } else {
+                temp.add(new JLabel(annonce.getSales_at().toString()));
+            }
             temp.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             this.add(temp);
         }
@@ -139,7 +152,7 @@ public class AnnoncePanel extends JPanel {
         // affichage annonce par annonce
         for (Annonce annonce: allAnnonces) {
             JPanel temp = new JPanel();
-            temp.setLayout(new GridLayout(7, 2));
+            temp.setLayout(new GridLayout(9, 2));
             temp.add(new JLabel("id :"));
             temp.add(new JLabel(String.valueOf(annonce.getId())));
             temp.add(new JLabel("titre :"));
@@ -168,7 +181,66 @@ public class AnnoncePanel extends JPanel {
                 }
             });
             temp.add(temp2);
-            temp.add(new JPanel());
+            temp.add(new JLabel("vendu :"));
+            if (annonce.getVendu()) {
+                temp.add(new JLabel("oui"));
+            } else {
+                temp.add(new JLabel("non"));
+            }
+            temp.add(new JLabel("date vente :"));
+            if(annonce.getSales_at() == null) {
+                temp.add(new JLabel("----"));
+            } else {
+                temp.add(new JLabel(annonce.getSales_at().toString()));
+            }
+            JButton modifier = new JButton("modifier");
+            modifier.addActionListener(h -> {
+                this.removeAll();
+                // setup layout
+                this.setLayout(new GridLayout(3, 2));
+                // add titre
+                JLabel titre = new JLabel("titre :");
+                JTextField titreField = new JTextField();
+                titreField.setText(annonce.getTitre());
+                this.add(titre);
+                this.add(titreField);
+
+                //add vendu
+                JLabel vendu = new JLabel("vendu :");
+                JCheckBox venduField = new JCheckBox();
+                try {
+                    venduField.setSelected(annonce.isVendu());
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+                this.add(vendu);
+                this.add(venduField);
+
+                //add submit
+                this.add(new JPanel());
+                JButton submit = new JButton ("modifier");
+                submit.addActionListener(e -> {
+                    annonce.setTitre(titreField.getText());
+                    if(venduField.isSelected()) {
+                        annonce.setVendu(true);
+                        annonce.setSalesAt(new Timestamp(System.currentTimeMillis()));
+                    }
+                    try {
+                        annonce.update();
+                    } catch (SQLException | ClassNotFoundException throwables) {
+                        throwables.printStackTrace();
+                    }
+                    try {
+                        showAllAnnonces();
+                    } catch (SQLException | ClassNotFoundException throwables) {
+                        throwables.printStackTrace();
+                    }
+                });
+                this.add(submit);
+                this.revalidate();
+                this.repaint();
+            });
+            temp.add(modifier);
             JButton suppression = new JButton("supprimer");
             suppression.addActionListener(e -> {
                 try {
@@ -407,6 +479,11 @@ public class AnnoncePanel extends JPanel {
             } catch (SQLException | ClassNotFoundException throwables) {
                 throwables.printStackTrace();
             }
+            try {
+                showAllAnnonces();
+            } catch (SQLException | ClassNotFoundException throwables) {
+                throwables.printStackTrace();
+            }
 
         });
         this.add(submit);
@@ -423,9 +500,11 @@ public class AnnoncePanel extends JPanel {
     public void showBien(Integer id) throws SQLException, ClassNotFoundException, NoSuchAlgorithmException {
         this.removeAll();
         Bien bien = Bien.find(id);
-        this.setLayout(new GridLayout(15,2));
+        this.setLayout(new GridLayout(16,2));
         this.add(new JLabel("id :"));
         this.add(new JLabel(String.valueOf(bien.getId())));
+        this.add(new JLabel("adresse :"));
+        this.add(new JLabel(bien.getAddress()));
         this.add(new JLabel("superficie :"));
         this.add(new JLabel(String.valueOf(bien.getSuperficie())));
         this.add(new JLabel("nb_pieces :"));

@@ -2,8 +2,7 @@ package com.backend;
 
 import com.company.ConnexionPanel;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,6 +90,66 @@ public class ContreProposition {
      */
     public Float getPrix() {
         return this.prix;
+    }
+
+    /**
+     * methode pour sauvegarder l'instance en base
+     * @return un boolean de verification
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public boolean save() throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "INSERT INTO ContreProposition(prix, id_vendeur, id_propositionachat) VALUES (" + this.getPrix() + "," + this.getIdVendeur() + "," + this.getidProposition() + ")";
+        Integer test = db.insertOrUpdate(query);
+        if (test > 1) {
+            retour = true;
+        }
+        db.close();
+        return retour;
+    }
+
+    /**
+     * methode pour modifier une entité en base
+     * @return
+     * @throws SQLException
+     */
+    public boolean update() throws SQLException {
+        boolean retour = false;
+        String url = "jdbc:mysql://localhost:3306/stephiplacelog";
+        Connection con = DriverManager.getConnection(url, "root", "");
+        PreparedStatement pstmt = con.prepareStatement("UPDATE contreproposition SET prix = ?, id_Vendeur = ?, id_PropositionAchat = ? WHERE id = ?;");
+        pstmt.setFloat(1, this.getPrix());
+        pstmt.setInt(2, this.getIdVendeur());
+        pstmt.setInt(3, this.getidProposition());
+        pstmt.setInt(4, this.getId());
+        Integer test  = pstmt.executeUpdate();
+        if (test > 1) {
+            retour = true;
+        }
+        con.close();
+        return retour;
+    }
+
+    /**
+     * methode pour supprimer l'instance en base
+     * @return un boolean de verification
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public boolean delete() throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "DELETE FROM ContreProposition WHERE id = " + this.getId() + ";";
+        Integer test = db.insertOrUpdate(query);
+        if (test > 1) {
+            retour = true;
+        }
+        db.close();
+        return retour;
     }
 
     /**

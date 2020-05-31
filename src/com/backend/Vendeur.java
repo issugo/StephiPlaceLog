@@ -211,53 +211,15 @@ public class Vendeur {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public boolean update(String champ, String newValue) throws SQLException, ClassNotFoundException {
-        boolean retour = false;
-        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
-        db.connect();
-        String query = "UPDATE vendeur SET " + champ + " = '" + newValue + "' WHERE id = " + this.getId() + ";";
-        Integer test = db.insertOrUpdate(query);
-        if (test > 1) {
-            retour = true;
-        }
-        db.close();
-        return retour;
-    }
-
-    /**
-     * methode pour modifier l'instance en base
-     * @return un boolean de verification
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     */
-    public boolean update(String champ, Integer newValue) throws SQLException, ClassNotFoundException {
-        boolean retour = false;
-        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
-        db.connect();
-        String query = "UPDATE client SET " + champ + " = " + newValue + " WHERE id = " + this.getId() + ";";
-        Integer test = db.insertOrUpdate(query);
-        if (test > 1) {
-            retour = true;
-        }
-        db.close();
-        return retour;
-    }
-
-    /**
-     * methode pour modifier l'instance en base
-     * @return un boolean de verification
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     */
-    public boolean update(String champ, Blob newValue) throws SQLException, ClassNotFoundException {
+    public boolean update() throws SQLException, ClassNotFoundException {
         boolean retour = false;
         String url = "jdbc:mysql://localhost:3306/stephiplacelog";
         Connection con = DriverManager.getConnection(url, "root", "");
-        PreparedStatement pstmt = con.prepareStatement("UPDATE client SET ? = ? WHERE id = ?;");
-        pstmt.setString(1, champ);
-        pstmt.setBlob(2, newValue);
+        PreparedStatement pstmt = con.prepareStatement("UPDATE vendeur SET carte_identite = ?, id_Client = ? WHERE id = ?;");
+        pstmt.setBlob(1, this.getCINTemp());
+        pstmt.setInt(2, this.getIdClient());
         pstmt.setInt(3, this.getId());
-        Integer test = pstmt.executeUpdate();
+        Integer test  = pstmt.executeUpdate();
         if (test > 1) {
             retour = true;
         }

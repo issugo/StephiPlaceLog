@@ -7,9 +7,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -183,35 +181,22 @@ public class Client {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public boolean update(String champ, String newValue) throws SQLException, ClassNotFoundException {
+    public boolean update() throws SQLException, ClassNotFoundException {
         boolean retour = false;
-        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
-        db.connect();
-        String query = "UPDATE client SET " + champ + " = '" + newValue + "' WHERE id = " + this.getId() + ";";
-        Integer test = db.insertOrUpdate(query);
+        String url = "jdbc:mysql://localhost:3306/stephiplacelog";
+        Connection con = DriverManager.getConnection(url, "root", "");
+        PreparedStatement pstmt = con.prepareStatement("UPDATE Client SET nom = ?, prenom = ?, email = ?, telephone = ?, password = ? WHERE id = ?;");
+        pstmt.setString(1, this.getNom());
+        pstmt.setString(2, this.getPrenom());
+        pstmt.setString(3, this.getEmail());
+        pstmt.setString(4, this.getTelephone());
+        pstmt.setString(5, this.getPassword());
+        pstmt.setInt(6, this.getId());
+        Integer test  = pstmt.executeUpdate();
         if (test > 1) {
             retour = true;
         }
-        db.close();
-        return retour;
-    }
-
-    /**
-     * methode pour modifier l'instance en base
-     * @return un boolean de verification
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     */
-    public boolean update(String champ, Integer newValue) throws SQLException, ClassNotFoundException {
-        boolean retour = false;
-        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
-        db.connect();
-        String query = "UPDATE client SET " + champ + " = " + newValue + " WHERE id = " + this.getId() + ";";
-        Integer test = db.insertOrUpdate(query);
-        if (test > 1) {
-            retour = true;
-        }
-        db.close();
+        con.close();
         return retour;
     }
 

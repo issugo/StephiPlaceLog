@@ -2,8 +2,7 @@ package com.backend;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +12,8 @@ import java.util.List;
 public class Annonce {
 
     Integer id_bien, id_agent, id, nb_favoris, nb_visites;
+    boolean vendu;
+    Timestamp sales_at;
     String titre;
 
     /**
@@ -25,6 +26,8 @@ public class Annonce {
         this.nb_visites = 0;
         this.nb_favoris = 0;
         this.titre = null;
+        this.vendu = false;
+        this.sales_at = null;
     }
 
     /**
@@ -136,6 +139,42 @@ public class Annonce {
     }
 
     /**
+     * setter de vendu
+     * @param vendu
+     * @return vendu
+     */
+    public boolean setVendu(boolean vendu) {
+        this.vendu = vendu;
+        return this.vendu;
+    }
+
+    /**
+     * getter de vendu
+     * @return vendu
+     */
+    public boolean getVendu() {
+        return this.vendu;
+    }
+
+    /**
+     * setter de sales_at
+     * @param sales_at
+     * @return sales_at
+     */
+    public Timestamp setSalesAt(Timestamp sales_at) {
+        this.sales_at = sales_at;
+        return this.sales_at;
+    }
+
+    /**
+     * getter de sales_at
+     * @return
+     */
+    public Timestamp getSales_at() {
+        return this.sales_at;
+    }
+
+    /**
      * methode pour retrouver une Annonce par son id
      * @param id
      * @return une instance de la classe annonce
@@ -156,6 +195,8 @@ public class Annonce {
         instance.setNb_favoris(result.getInt("nb_favoris"));
         instance.setNb_visites(result.getInt("nb_visites"));
         instance.setTitre(result.getString("titre"));
+        instance.setSalesAt(result.getTimestamp("sales_at"));
+        instance.setVendu(result.getBoolean("vendu"));
         return instance;
     }
 
@@ -179,6 +220,8 @@ public class Annonce {
             instance.setNb_favoris(result.getInt("nb_favoris"));
             instance.setNb_visites(result.getInt("nb_visites"));
             instance.setTitre(result.getString("titre"));
+            instance.setSalesAt(result.getTimestamp("sales_at"));
+            instance.setVendu(result.getBoolean("vendu"));
             retour.add(instance);
         }
         return retour;
@@ -194,7 +237,7 @@ public class Annonce {
         boolean retour = false;
         Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
-        String query = "INSERT INTO annonce(id_bien, id_agent, nb_favoris, nb_visites, titre) VALUES (" + this.getId_bien() + "," + this.getId_agent() + "," + this.getNb_favoris() + "," + this.getNb_visites() + ",'" + this.getTitre() + "');";
+        String query = "INSERT INTO annonce(id_bien, id_agent, nb_favoris, nb_visites, titre, vendu, sales_at) VALUES (" + this.getId_bien() + "," + this.getId_agent() + "," + this.getNb_favoris() + "," + this.getNb_visites() + ",'" + this.getTitre() + "', "+ this.getVendu() + "," + this.getSales_at() + ");";
         System.out.println(query);
         Integer test = db.insertOrUpdate(query);
         if (test > 1) {
@@ -206,43 +249,26 @@ public class Annonce {
 
     /**
      * methode pour modifier un champ d'une instance de Annonce en bdd
-     * @param champ
-     * @param newValue
      * @return un boolean de verification
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public boolean update(String champ, String newValue) throws SQLException, ClassNotFoundException {
+    public boolean update() throws SQLException, ClassNotFoundException {
         boolean retour = false;
-        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
-        db.connect();
-        String query = "UPDATE annonce SET " + champ + " = '" + newValue + "' WHERE id = " + this.getId() + ";";
-        Integer test = db.insertOrUpdate(query);
+        String url = "jdbc:mysql://localhost:3306/stephiplacelog";
+        Connection con = DriverManager.getConnection(url, "root", "");
+        PreparedStatement pstmt = con.prepareStatement("UPDATE Annonce SET id_Bien = ?, id_Agent = ?, titre = ?, vendu = ?, sales_at = ? WHERE id = ?;");
+        pstmt.setInt(1, this.getId_bien());
+        pstmt.setInt(2, this.getId_agent());
+        pstmt.setString(3, this.getTitre());
+        pstmt.setBoolean(4, this.getVendu());
+        pstmt.setTimestamp(5, this.getSales_at());
+        pstmt.setInt(6, this.getId());
+        Integer test  = pstmt.executeUpdate();
         if (test > 1) {
             retour = true;
         }
-        db.close();
-        return retour;
-    }
-
-    /**
-     * methode pour modifier un champ d'une instance de Annonce en bdd
-     * @param champ
-     * @param newValue
-     * @return un boolean de verification
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     */
-    public boolean update(String champ, Integer newValue) throws SQLException, ClassNotFoundException {
-        boolean retour = false;
-        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
-        db.connect();
-        String query = "UPDATE annonce SET " + champ + " = " + newValue + " WHERE id = " + this.getId() + ";";
-        Integer test = db.insertOrUpdate(query);
-        if (test > 1) {
-            retour = true;
-        }
-        db.close();
+        con.close();
         return retour;
     }
 
@@ -286,6 +312,8 @@ public class Annonce {
         instance.setNb_favoris(result.getInt("nb_favoris"));
         instance.setNb_visites(result.getInt("nb_visites"));
         instance.setTitre(result.getString("titre"));
+        instance.setSalesAt(result.getTimestamp("sales_at"));
+        instance.setVendu(result.getBoolean("vendu"));
         return instance;
     }
 
@@ -311,7 +339,46 @@ public class Annonce {
             instance.setNb_favoris(result.getInt("nb_favoris"));
             instance.setNb_visites(result.getInt("nb_visites"));
             instance.setTitre(result.getString("titre"));
+            instance.setSalesAt(result.getTimestamp("sales_at"));
+            instance.setVendu(result.getBoolean("vendu"));
             retour.add(instance);
+        }
+        return retour;
+    }
+
+    /**
+     * methode pour savoir si l'annonce a des propositions
+     * @return un boolean de validation
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public boolean hasProposition() throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "select * from PropositionAchat where id_Annonce = " + this.getId();
+        ResultSet result = db.select(query);
+        while (result.next()) {
+            retour = true;
+        }
+        return retour;
+    }
+
+    /**
+     * methode pour savoir si le bien de l'annonce est vendu
+     * @return boolean pour savoir si l'annonce est vendu
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public boolean isVendu() throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "SELECT * FROM annonce WHERE id = ";
+        query += this.getId();
+        ResultSet result = db.select(query);
+        while (result.next()) {
+            retour = result.getBoolean("vendu");
         }
         return retour;
     }

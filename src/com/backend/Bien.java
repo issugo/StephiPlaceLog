@@ -2,9 +2,7 @@ package com.backend;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +13,7 @@ public class Bien {
 
     Integer id, nb_pieces, id_vendeur;
     Boolean jardin, cave, ceillier, loggia, terrasse, garage, verranda;
-    String description, type;
+    String description, type, address;
     Float superficie, prix_min, frais_agence;
 
     /**
@@ -37,6 +35,7 @@ public class Bien {
         this.prix_min = null;
         this.frais_agence = null;
         this.id_vendeur = null;
+        this.address = null;
     }
 
     /**
@@ -310,6 +309,24 @@ public class Bien {
     }
 
     /**
+     * setter de l'adresse du bien
+     * @param address
+     * @return l'adresse du bien
+     */
+    public String setAddress(String address) {
+        this.address = address;
+        return this.address;
+    }
+
+    /**
+     * getter de l'adresse du bien
+     * @return l'adresse du bien
+     */
+    public String getAddress() {
+        return this.address;
+    }
+
+    /**
      * methode pour ecrire la description de l'instance
      * @return la description de l'instance
      */
@@ -327,7 +344,7 @@ public class Bien {
         boolean retour = false;
         Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
-        String query = "INSERT INTO bien(superficie, nb_pieces, type, description, jardin, cave, ceillier, loggia, terrasse, garage, verranda, prix_min, frais_agence, id_vendeur) VALUES (" + this.getSuperficie() + "," + this.getNb_pieces() + ",'" + this.getType() + "','" + this.getDescription() + "'," + this.getJardin() + "," + this.getCave() + "," + this.getCeillier() + "," + this.getLoggia() + "," + this.getTerrasse() + "," + this.getGarage() + "," + this.getVerranda() + "," + this.getPrix_min() + "," + this.getFrais_agence() + "," + this.getIdVendeur() + ")";
+        String query = "INSERT INTO bien(superficie, nb_pieces, type, description, jardin, cave, ceillier, loggia, terrasse, garage, verranda, prix_min, frais_agence, id_vendeur, address) VALUES (" + this.getSuperficie() + "," + this.getNb_pieces() + ",'" + this.getType() + "','" + this.getDescription() + "'," + this.getJardin() + "," + this.getCave() + "," + this.getCeillier() + "," + this.getLoggia() + "," + this.getTerrasse() + "," + this.getGarage() + "," + this.getVerranda() + "," + this.getPrix_min() + "," + this.getFrais_agence() + "," + this.getIdVendeur() + ", '" + this.getAddress() + "')";
         Integer test = db.insertOrUpdate(query);
         if (test > 1) {
             retour = true;
@@ -338,43 +355,36 @@ public class Bien {
 
     /**
      * methode pour modifier une string d'une instance en base
-     * @param champ
-     * @param newValue
      * @return un boolean de verification
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public boolean update(String champ, String newValue) throws SQLException, ClassNotFoundException {
+    public boolean update() throws SQLException, ClassNotFoundException {
         boolean retour = false;
-        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
-        db.connect();
-        String query = "UPDATE bien SET " + champ + " = '" + newValue + "' WHERE id = " + this.getId() + ";";
-        Integer test = db.insertOrUpdate(query);
+        String url = "jdbc:mysql://localhost:3306/stephiplacelog";
+        Connection con = DriverManager.getConnection(url, "root", "");
+        PreparedStatement pstmt = con.prepareStatement("UPDATE Bien SET superficie = ?, nb_pieces = ?, type = ?, description = ?, jardin = ?, cave = ?, ceillier = ?, loggia = ?, terrasse = ?, garage = ?, verranda = ?, prix_min = ?, frais_agence = ?, id_vendeur = ?, address = ? WHERE id = ?;");
+        pstmt.setFloat(1, this.getSuperficie());
+        pstmt.setInt(2, this.getNb_pieces());
+        pstmt.setString(3, this.getType());
+        pstmt.setString(4, this.getDescription());
+        pstmt.setBoolean(5, this.getJardin());
+        pstmt.setBoolean(6, this.getCave());
+        pstmt.setBoolean(7, this.getCeillier());
+        pstmt.setBoolean(8, this.getLoggia());
+        pstmt.setBoolean(9, this.getTerrasse());
+        pstmt.setBoolean(10, this.getGarage());
+        pstmt.setBoolean(11, this.getVerranda());
+        pstmt.setFloat(12, this.getPrix_min());
+        pstmt.setFloat(13, this.getFrais_agence());
+        pstmt.setInt(14, this.getIdVendeur());
+        pstmt.setString(15, this.getAddress());
+        pstmt.setInt(16, this.getId());
+        Integer test  = pstmt.executeUpdate();
         if (test > 1) {
             retour = true;
         }
-        db.close();
-        return retour;
-    }
-
-    /**
-     * methode pour modifier un int de l'instance en base
-     * @param champ
-     * @param newValue
-     * @return un boolean de verification
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     */
-    public boolean update(String champ, Integer newValue) throws SQLException, ClassNotFoundException {
-        boolean retour = false;
-        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
-        db.connect();
-        String query = "UPDATE bien SET " + champ + " = " + newValue + " WHERE id = " + this.getId() + ";";
-        Integer test = db.insertOrUpdate(query);
-        if (test > 1) {
-            retour = true;
-        }
-        db.close();
+        con.close();
         return retour;
     }
 
@@ -427,6 +437,7 @@ public class Bien {
         instance.setPrix_min(result.getFloat("prix_min"));
         instance.setFrais_agence(result.getFloat("frais_agence"));
         instance.setIdVendeur(result.getInt("id_vendeur"));
+        instance.setAddress(result.getString("address"));
         db.close();
         return instance;
     }
@@ -460,6 +471,7 @@ public class Bien {
             instance.setPrix_min(result.getFloat("prix_min"));
             instance.setFrais_agence(result.getFloat("frais_agence"));
             instance.setIdVendeur(result.getInt("id_vendeur"));
+            instance.setAddress(result.getString("address"));
             retour.add(instance);
         }
         db.close();
@@ -498,7 +510,6 @@ public class Bien {
         db.connect();
         String query = "select * from annonce where id_bien = " + this.getId();
         ResultSet result = db.select(query);
-        ResultSetMetaData meta = result.getMetaData();
         while (result.next()) {
             retour = true;
         }

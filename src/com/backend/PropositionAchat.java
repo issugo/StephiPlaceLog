@@ -1,13 +1,12 @@
 package com.backend;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PropositionAchat {
 
-    Integer id, id_bien, id_client;
+    Integer id, id_annonce, id_client;
     Float prix;
 
     /**
@@ -15,7 +14,7 @@ public class PropositionAchat {
      */
     public PropositionAchat() {
         this.id = null;
-        this.id_bien = null;
+        this.id_annonce = null;
         this.id_client = null;
         this.prix = null;
     }
@@ -40,20 +39,20 @@ public class PropositionAchat {
 
     /**
      * setter de l'id du bien lié à la proposition d'achat
-     * @param id_bien
+     * @param id_annonce
      * @return l'id du bien lié à la proposition d'achat
      */
-    public Integer setIdBien(Integer id_bien) {
-        this.id_bien = id_bien;
-        return this.id_bien;
+    public Integer setIdAnnonce(Integer id_annonce) {
+        this.id_annonce = id_annonce;
+        return this.id_annonce;
     }
 
     /**
      * getter de l'id du bien lié à la proposition d'achat
      * @return l'id du bien lié à la proposition d'achat
      */
-    public Integer getIdBien() {
-        return this.id_bien;
+    public Integer getIdAnnonce() {
+        return this.id_annonce;
     }
 
     /**
@@ -93,6 +92,66 @@ public class PropositionAchat {
     }
 
     /**
+     * methode pour sauvegarder l'instance en base
+     * @return un boolean de verification
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public boolean save() throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "INSERT INTO PropositionAchat(prix, id_client, id_annonce) VALUES (" + this.getPrix() + "," + this.getidClient() + "," + this.getIdAnnonce() + ")";
+        Integer test = db.insertOrUpdate(query);
+        if (test > 1) {
+            retour = true;
+        }
+        db.close();
+        return retour;
+    }
+
+    /**
+     * methode pour modifier une entité en base
+     * @return
+     * @throws SQLException
+     */
+    public boolean update() throws SQLException {
+        boolean retour = false;
+        String url = "jdbc:mysql://localhost:3306/stephiplacelog";
+        Connection con = DriverManager.getConnection(url, "root", "");
+        PreparedStatement pstmt = con.prepareStatement("UPDATE propositionachat SET prix = ?, id_Client = ?, id_annonce = ? WHERE id = ?;");
+        pstmt.setFloat(1, this.getPrix());
+        pstmt.setInt(2, this.getidClient());
+        pstmt.setInt(3, this.getIdAnnonce());
+        pstmt.setInt(4, this.getId());
+        Integer test  = pstmt.executeUpdate();
+        if (test > 1) {
+            retour = true;
+        }
+        con.close();
+        return retour;
+    }
+
+    /**
+     * methode pour supprimer l'instance en base
+     * @return un boolean de verification
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public boolean delete() throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "DELETE FROM PropositionAchat WHERE id = " + this.getId() + ";";
+        Integer test = db.insertOrUpdate(query);
+        if (test > 1) {
+            retour = true;
+        }
+        db.close();
+        return retour;
+    }
+
+    /**
      * methode pour récupérer une instance de PropositionAchat en fonction de son id
      * @param id
      * @return une instance de PropositionAchat en fonction de son id
@@ -109,7 +168,7 @@ public class PropositionAchat {
         PropositionAchat instance = new PropositionAchat();
         instance.setId(result.getInt("id"));
         instance.setPrix(result.getFloat("prix"));
-        instance.setIdBien(result.getInt("id_bien"));
+        instance.setIdAnnonce(result.getInt("id_annonce"));
         instance.setIdClient(result.getInt("id_client"));
         db.close();
         return instance;
@@ -131,7 +190,7 @@ public class PropositionAchat {
             PropositionAchat instance = new PropositionAchat();
             instance.setId(result.getInt("id"));
             instance.setPrix(result.getFloat("prix"));
-            instance.setIdBien(result.getInt("id_bien"));
+            instance.setIdAnnonce(result.getInt("id_annonce"));
             instance.setIdClient(result.getInt("id_client"));
             retour.add(instance);
         }
@@ -156,7 +215,7 @@ public class PropositionAchat {
             PropositionAchat instance = new PropositionAchat();
             instance.setId(result.getInt("id"));
             instance.setPrix(result.getFloat("prix"));
-            instance.setIdBien(result.getInt("id_bien"));
+            instance.setIdAnnonce(result.getInt("id_annonce"));
             instance.setIdClient(result.getInt("id_client"));
             retour.add(instance);
         }
@@ -181,11 +240,29 @@ public class PropositionAchat {
             PropositionAchat instance = new PropositionAchat();
             instance.setId(result.getInt("id"));
             instance.setPrix(result.getFloat("prix"));
-            instance.setIdBien(result.getInt("id_bien"));
+            instance.setIdAnnonce(result.getInt("id_annonce"));
             instance.setIdClient(result.getInt("id_client"));
             retour.add(instance);
         }
         db.close();
+        return retour;
+    }
+
+    /**
+     * methode pour savoir si la proposition a des contre-propositions
+     * @return un boolean de validation
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public boolean hasContreProposition() throws SQLException, ClassNotFoundException {
+        boolean retour = false;
+        Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
+        db.connect();
+        String query = "select * from ContreProposition where id_PropositionAchat = " + this.getId();
+        ResultSet result = db.select(query);
+        while (result.next()) {
+            retour = true;
+        }
         return retour;
     }
 }

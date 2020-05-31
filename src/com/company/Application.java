@@ -32,6 +32,7 @@ public class Application extends JFrame{
      */
     public Application(Integer idAgent) throws Exception {
         //preparation des components
+        this.setTitle("Stephi Place Software");
         this.save = this;
         this.idAgentCo = idAgent;
         this.mainPanel = new JPanel();
@@ -46,8 +47,6 @@ public class Application extends JFrame{
         //defini les preset
         setTitle("Stephi Place Logiciel");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        System.out.println("width : " + this.width);
-        System.out.println("height : " + this.height);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setUndecorated(true);
         setMaximumSize(new Dimension(this.width, this.height));

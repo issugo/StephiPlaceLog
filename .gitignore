@@ -1,3 +1,4 @@
 #disable out git
 out/
 .idea/
+diagrams/
