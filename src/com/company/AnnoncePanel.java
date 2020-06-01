@@ -6,6 +6,7 @@ import com.backend.Image;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 /**
@@ -84,7 +86,7 @@ public class AnnoncePanel extends JPanel {
         // affichage annonce par annonce
         for (Annonce annonce: allAnnonces) {
             JPanel temp = new JPanel();
-            temp.setLayout(new GridLayout(8, 2));
+            temp.setLayout(new GridLayout(9, 2));
             temp.add(new JLabel("id :"));
             temp.add(new JLabel(String.valueOf(annonce.getId())));
             temp.add(new JLabel("titre :"));
@@ -125,6 +127,16 @@ public class AnnoncePanel extends JPanel {
             } else {
                 temp.add(new JLabel(annonce.getSales_at().toString()));
             }
+            temp.add(new JLabel("images :"));
+            JButton image = new JButton("images");
+            image.addActionListener(e -> {
+                try {
+                    showImageBien(annonce);
+                } catch (SQLException | ClassNotFoundException | IOException throwables) {
+                    throwables.printStackTrace();
+                }
+            });
+            temp.add(image);
             temp.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             this.add(temp);
         }
@@ -662,6 +674,22 @@ public class AnnoncePanel extends JPanel {
             temp.add(new JLabel("prix :"));
             temp.add(new JLabel(prop.getPrix().toString()));
             this.add(temp);
+        }
+        this.revalidate();
+        this.repaint();
+    }
+
+    public void showImageBien(Annonce annonce) throws SQLException, ClassNotFoundException, IOException {
+        List<Image> images = Bien.find(annonce.getId_bien()).getImages();
+        this.removeAll();
+        this.setLayout(new GridLayout(images.size()/2, 2));
+        for (Image image: images) {
+            BufferedInputStream is = new BufferedInputStream(image.getBinaries().getBinaryStream());
+            java.awt.Image raw = ImageIO.read(is);
+            JLabel voila = new JLabel();
+            voila.setIcon(new ImageIcon(new ImageIcon(raw).getImage().getScaledInstance(250, 250, java.awt.Image.SCALE_DEFAULT)));
+            voila.setMaximumSize(new Dimension(100, 100));
+            this.add(voila);
         }
         this.revalidate();
         this.repaint();
