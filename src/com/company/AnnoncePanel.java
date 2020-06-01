@@ -152,7 +152,11 @@ public class AnnoncePanel extends JPanel {
         // affichage annonce par annonce
         for (Annonce annonce: allAnnonces) {
             JPanel temp = new JPanel();
-            temp.setLayout(new GridLayout(9, 2));
+            if (annonce.hasProposition()) {
+                temp.setLayout(new GridLayout(10, 2));
+            } else {
+                temp.setLayout(new GridLayout(9, 2));
+            }
             temp.add(new JLabel("id :"));
             temp.add(new JLabel(String.valueOf(annonce.getId())));
             temp.add(new JLabel("titre :"));
@@ -192,6 +196,18 @@ public class AnnoncePanel extends JPanel {
                 temp.add(new JLabel("----"));
             } else {
                 temp.add(new JLabel(annonce.getSales_at().toString()));
+            }
+            if(annonce.hasProposition()) {
+                temp.add(new JLabel("propositions :"));
+                JButton propositions = new JButton("proposisitons");
+                propositions.addActionListener(e -> {
+                    try {
+                        showPropositions(annonce.getId());
+                    } catch (SQLException | ClassNotFoundException | NoSuchAlgorithmException throwables) {
+                        throwables.printStackTrace();
+                    }
+                });
+                temp.add(propositions);
             }
             JButton modifier = new JButton("modifier");
             modifier.addActionListener(h -> {
@@ -579,6 +595,74 @@ public class AnnoncePanel extends JPanel {
         this.add(new JLabel(String.valueOf(agent.getId())));
         this.add(new JLabel("code_agent :"));
         this.add(new JLabel(String.valueOf(agent.getCode_agent())));
+        this.revalidate();
+        this.repaint();
+    }
+
+    /**
+     * methode pour montrer toute les propositions
+     * @param id
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws NoSuchAlgorithmException
+     */
+    public void showPropositions(Integer id) throws SQLException, ClassNotFoundException, NoSuchAlgorithmException {
+        List<PropositionAchat> props = PropositionAchat.findByIdAnnonce(id);
+        this.removeAll();
+        this.setLayout(new GridLayout(props.size()/2, 2));
+        for(PropositionAchat prop: props) {
+            JPanel temp = new JPanel();
+            if(prop.hasContreProposition()) {
+                temp.setLayout(new GridLayout(4, 2));
+            } else {
+                temp.setLayout(new GridLayout(3, 2));
+            }
+            temp.add(new JLabel("id annonce :"));
+            temp.add(new JLabel(prop.getIdAnnonce().toString()));
+            temp.add(new JLabel("email client :"));
+            temp.add(new JLabel(Client.find(prop.getidClient()).getEmail()));
+            temp.add(new JLabel("prix :"));
+            temp.add(new JLabel(prop.getPrix().toString()));
+            if (prop.hasContreProposition()) {
+                temp.add(new JLabel("contre-propositions :"));
+                JButton contreProp = new JButton("contre-proposisitons");
+                contreProp.addActionListener(e -> {
+                    try {
+                        showContrePropositions(prop.getId());
+                    } catch (SQLException | ClassNotFoundException | NoSuchAlgorithmException throwables) {
+                        throwables.printStackTrace();
+                    }
+                });
+                temp.add(contreProp);
+            }
+            this.add(temp);
+        }
+        this.revalidate();
+        this.repaint();
+    }
+
+    /**
+     * methode pour montrer les contre-propositions faites pour une proposition
+     * @param id
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws NoSuchAlgorithmException
+     */
+    public void showContrePropositions(Integer id) throws SQLException, ClassNotFoundException, NoSuchAlgorithmException {
+        List<ContreProposition> props = ContreProposition.findByIdProposition(id);
+        this.removeAll();
+        this.setLayout(new GridLayout(props.size()/2, 2));
+        for(ContreProposition prop: props) {
+            JPanel temp = new JPanel();
+            temp.setLayout(new GridLayout(3, 2));
+            temp.add(new JLabel("id proposition :"));
+            temp.add(new JLabel(prop.getidProposition().toString()));
+            temp.add(new JLabel("email vendeur :"));
+            temp.add(new JLabel(Client.find(Vendeur.find(prop.getIdVendeur()).getIdClient()).getEmail()));
+            temp.add(new JLabel("prix :"));
+            temp.add(new JLabel(prop.getPrix().toString()));
+            this.add(temp);
+        }
         this.revalidate();
         this.repaint();
     }

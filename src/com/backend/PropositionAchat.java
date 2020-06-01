@@ -230,11 +230,11 @@ public class PropositionAchat {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public static List<PropositionAchat> findByIdBien(Integer id) throws SQLException, ClassNotFoundException {
+    public static List<PropositionAchat> findByIdAnnonce(Integer id) throws SQLException, ClassNotFoundException {
         List<PropositionAchat> retour = new ArrayList<>();
         Mysql db = new Mysql("localhost", "3306", "stephiplacelog", "root", "");
         db.connect();
-        String query = "SELECT * FROM PropositionAchat WHERE id_bien = " + id;
+        String query = "SELECT * FROM PropositionAchat WHERE id_annonce = " + id;
         ResultSet result = db.select(query);
         while (result.next()) {
             PropositionAchat instance = new PropositionAchat();
